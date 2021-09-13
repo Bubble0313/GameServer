@@ -1,6 +1,5 @@
 package Model;
 
-import Constants.GameConstants;
 import Controller.Level;
 import lombok.Getter;
 import lombok.Setter;
