@@ -30,7 +30,6 @@ public class GameModel {
         score = 0;
         speed = Level.L1.speed;
         player = "Bot";
-        System.out.println(GameConstants.grid);
     }
 
     public void initialiseSnake(Integer headX, Integer headY, Integer grid){

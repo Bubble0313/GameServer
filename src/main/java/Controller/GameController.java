@@ -4,9 +4,7 @@ import Constants.GameConstants;
 import Model.Direction;
 import Model.GameModel;
 import View.GameView;
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -14,7 +12,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import org.ini4j.Wini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,12 +184,14 @@ public class GameController {
     }
 
     public void tickUpdate() {
+        //override run function - while game is true, for each model, move it forward, t.sleep(game speed)
+        //e.g. 4 ticks per second, use 1000/4
         for (GameModel model : models) {
-            KeyFrame keyFrame = new KeyFrame(new Duration(model.getSpeed()), new EventHandler<ActionEvent>() {
+            Runnable r = new Runnable() {
                 @Override
-                public void handle(ActionEvent event) {
+                public void run() {
                     //only when the game start status is true
-                    if (model.getIsStart().equals(true)) {
+                    while (model.getIsStart().equals(true)) {
                         if (model.getSnakeX().get(0).equals(foodX) &&
                                 model.getSnakeY().get(0).equals(foodY)) {
                             //if the positions are the same, then the snake length increases 1,
@@ -223,23 +222,17 @@ public class GameController {
                                 stopGame(model);
                             }
                         }
+                        try {
+                            Thread.sleep(model.getSpeed());
+                        } catch (InterruptedException exception) {
+                            LOGGER.error(exception.getMessage());
+                        }
                     }
                 }
-            });
-            tick.setCycleCount(tick.INDEFINITE);
-            tick.getKeyFrames().add(keyFrame);
-        }
-        tick.play();
-
-//        Runnable r = new Runnable() {
-//            @Override
-//            public void run() {
-//                //override start function - while game is true, for each model, move it forward, t.sleep(game speed)
-//                //4 ticks per second, use 1000/4
-//            }
-//        };
-//        Thread t = new Thread(r);
-//        t.start();//run in a separate thread
+            };
+            Thread t = new Thread(r);
+            t.start();//run in a separate thread
+        };
     }
 
     public void stopGame(GameModel gameModel) {
