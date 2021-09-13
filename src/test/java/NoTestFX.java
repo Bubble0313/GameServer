@@ -17,11 +17,7 @@ public class NoTestFX {
 
     @Test
     public void testModelConstructor(){
-        GameModel snake1 = new GameModel(100, 100, 5, 8);
-        Integer x = 100;
-
-        //snake1.updateSnake(5, 600, 600);
-        assertEquals(x, snake1.getSnakeX().get(0));
+        GameModel snake1 = new GameModel();
     }
 
 }

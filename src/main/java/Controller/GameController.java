@@ -85,10 +85,9 @@ public class GameController {
     private EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
-            int snakeX = grid * (GameConstants.snakeLength + random.nextInt(GameConstants.num-10));
-            int snakeY = grid * (GameConstants.snakeLength + random.nextInt(GameConstants.num-10));
-            GameModel model1 = new GameModel(snakeX, snakeY, grid, GameConstants.snakeLength);
-            paintSnake(snakeX, snakeY);
+            GameModel model1 = new GameModel();
+            model1.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, GameConstants.num);
+            paintSnake(model1.getSnakeX().get(0), model1.getSnakeY().get(0));
             models.add(model1);
             //once the button is clicked, start the game
             models.get(0).setIsStart(true);
@@ -106,10 +105,9 @@ public class GameController {
             modelTextMap.get(models.get(0)).setText(models.get(0).getPlayer() + "'s current score: 0");
             //when there are 2 players
             if (view.getSnakeNum().equals(2)) {
-                snakeX = grid * (GameConstants.snakeLength + random.nextInt(GameConstants.num-10));
-                snakeY = grid * (GameConstants.snakeLength + random.nextInt(GameConstants.num-10));
-                GameModel model2 = new GameModel(snakeX, snakeY, grid, GameConstants.snakeLength);
-                paintSnake(snakeX, snakeY);
+                GameModel model2 = new GameModel();
+                model2.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, GameConstants.num);
+                paintSnake(model2.getSnakeX().get(0), model2.getSnakeY().get(0));
                 models.add(model2);
                 models.get(1).setIsStart(true);
                 setModelSpeed(models.get(1), view.getLevelChoiceBox().getSelectionModel().getSelectedIndex());
@@ -212,7 +210,7 @@ public class GameController {
                             view.paintTail(model.getSnakeX().get(model.getLength() - 1),
                                     model.getSnakeY().get(model.getLength() - 1), grid);
                         }
-                        model.updateSnake(grid, GameConstants.gameWidth, GameConstants.gameHeight);//change the coordinates of the snake in every move
+                        model.updateSnake(GameConstants.grid, GameConstants.gameWidth, GameConstants.gameHeight);//change the coordinates of the snake in every move
                         view.paintHead(model.getSnakeX().get(0), model.getSnakeY().get(0), grid);//paint the new head
                         view.paintBody(model.getSnakeX().get(1), model.getSnakeY().get(1), grid);//paint the old head to the colour of body
                         //after the move, check if snake head hits its own body

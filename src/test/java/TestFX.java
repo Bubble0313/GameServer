@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestFX extends ApplicationTest {
     int grid = 10;
-    GameModel snake1 = new GameModel(100, 100, grid, 8);
+    GameModel snake1 = new GameModel();
     ArrayList<GameModel> testModels = new ArrayList<>();
 
     @Override
@@ -36,14 +36,16 @@ public class TestFX extends ApplicationTest {
 
     @Before
     public void setup(){
+        snake1.initialiseSnake(8, grid, 50);
         testModels.add(snake1);
     }
 
     @Test
     public void testModelUpdateSnake(){
-        Integer x = 110;
+        int x = snake1.getSnakeX().get(0);
         snake1.updateSnake(grid, 500, 500);
-        assertEquals(x, snake1.getSnakeX().get(0));
+        int y = snake1.getSnakeX().get(0);
+        assertEquals(grid, y-x);
     }
 
     @Test

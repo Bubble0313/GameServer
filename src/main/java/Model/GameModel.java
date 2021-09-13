@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-//start reading networking tcpip network engine, send info from 1 laptop to another laptop (diff port)
-//not http, simple json msg, no web server, create a socket, to connect
+import java.util.Random;
+
 @Getter
 @Setter
 public class GameModel {
@@ -20,19 +20,21 @@ public class GameModel {
     private int speed;//the speed of the snake, i.e. the interval of timer running
     private String player;//player's name
     private int score;//score gained in the game
+    private Random ran = new Random();
 
-    public GameModel(Integer headX, Integer headY, Integer grid, Integer snakeLength){
+    public GameModel(){
         direction = Direction.RIGHT;//define the initial snake direction as right
         lastDirection = Direction.RIGHT;
-        length = snakeLength;
-        initialiseSnake(headX, headY, grid);
         isStart = false;
         score = 0;
         speed = Level.L1.speed;
         player = "Bot";
     }
 
-    public void initialiseSnake(Integer headX, Integer headY, Integer grid){
+    public void initialiseSnake(int len, int grid, int num){
+        length = len;
+        int headX = grid * (length + ran.nextInt(num-10));
+        int headY = grid * (length + ran.nextInt(num-10));
         snakeX.add(0, headX);
         snakeY.add(0, headY);
         for(int i=1; i<length; i++){
@@ -43,7 +45,7 @@ public class GameModel {
         }
     }//set snake body based on snake head
 
-    public void updateSnake(Integer grid, Integer width, Integer height){
+    public void updateSnake(int grid, int width, int height){
         //move the body
         for(int i = length-1; i>0; i--){
             snakeX.set(i, snakeX.get(i-1));
@@ -53,7 +55,7 @@ public class GameModel {
         moveHead(grid, width, height);
     }
 
-    public void moveHead(Integer grid, Integer width, Integer height) {
+    public void moveHead(int grid, int width, int height) {
         //based on the direction of the snake, check if the next move will make the snake out of the game border
         //if the next move makes the snake still within the border, then move the snake
         //else the game is over as the snake is out of the game border
