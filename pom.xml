@@ -51,6 +51,11 @@
             <artifactId>maven-resources-plugin</artifactId>
             <version>2.6</version>
         </dependency>
+        <dependency>
+            <groupId>de.saxsys</groupId>
+            <artifactId>jfx-testrunner</artifactId>
+            <version>1.2</version>
+        </dependency>
         <!--testfx -->
         <dependency>
             <groupId>org.testfx</groupId>
