@@ -12,6 +12,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import lombok.Getter;
+import lombok.Setter;
 import org.ini4j.Wini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,8 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+@Getter
+@Setter
 public class GameController {
     private ArrayList<GameModel> models;
     private GameView view;
@@ -38,6 +42,7 @@ public class GameController {
     }
 
     private int grid = GameConstants.grid;
+    private int num = GameConstants.num;
     private Random random = new Random();
     private Map<GameModel, Text> modelTextMap = new HashMap<>();
     private Timeline tick = new Timeline();
@@ -86,7 +91,7 @@ public class GameController {
         @Override
         public void handle(MouseEvent event) {
             GameModel model1 = new GameModel();
-            model1.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, GameConstants.num);
+            model1.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, num);
             paintSnake(model1.getSnakeX().get(0), model1.getSnakeY().get(0));
             models.add(model1);
             //once the button is clicked, start the game
@@ -106,7 +111,7 @@ public class GameController {
             //when there are 2 players
             if (view.getSnakeNum().equals(2)) {
                 GameModel model2 = new GameModel();
-                model2.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, GameConstants.num);
+                model2.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, num);
                 paintSnake(model2.getSnakeX().get(0), model2.getSnakeY().get(0));
                 models.add(model2);
                 models.get(1).setIsStart(true);
@@ -176,8 +181,8 @@ public class GameController {
     }
 
     public void showFood() {
-        foodX = grid * random.nextInt(GameConstants.num - 1);
-        foodY = grid * random.nextInt(GameConstants.num - 1);
+        foodX = grid * random.nextInt(num - 1);
+        foodY = grid * random.nextInt(num - 1);
         view.paintFood(foodX, foodY, grid);
     }
 

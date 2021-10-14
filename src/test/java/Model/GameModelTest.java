@@ -39,6 +39,7 @@ public class GameModelTest {
         assertNotNull(gameModel.getSnakeY().get(0));
         assertNotNull(gameModel.getSnakeY().get(1));
         assertNotNull(gameModel.getSnakeY().get(2));
+        assertNotNull(gameModel.getRan());
     }
 
     @Test
