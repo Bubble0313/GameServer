@@ -34,6 +34,8 @@ public class GameController {
     private int bestScore = -1;//the highest score
     private String bestPlayer = "N/A";//player that scores the highest
 
+    private File file;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
     public GameController(ArrayList<GameModel> models, GameView view) {
@@ -91,8 +93,8 @@ public class GameController {
         @Override
         public void handle(MouseEvent event) {
             GameModel model1 = new GameModel();
-            model1.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, num);
-            paintSnake(model1.getSnakeX().get(0), model1.getSnakeY().get(0));
+            model1.initialiseSnake(GameConstants.snakeLength, grid, num);
+            paintSnake(model1);
             models.add(model1);
             //once the button is clicked, start the game
             models.get(0).setIsStart(true);
@@ -111,8 +113,8 @@ public class GameController {
             //when there are 2 players
             if (view.getSnakeNum().equals(2)) {
                 GameModel model2 = new GameModel();
-                model2.initialiseSnake(GameConstants.snakeLength, GameConstants.grid, num);
-                paintSnake(model2.getSnakeX().get(0), model2.getSnakeY().get(0));
+                model2.initialiseSnake(GameConstants.snakeLength, grid, num);
+                paintSnake(model2);
                 models.add(model2);
                 models.get(1).setIsStart(true);
                 setModelSpeed(models.get(1), view.getLevelChoiceBox().getSelectionModel().getSelectedIndex());
@@ -173,10 +175,12 @@ public class GameController {
         }
     }
 
-    public void paintSnake(int snakeX, int snakeY) {
+    public void paintSnake(GameModel gameModel) {
+        int snakeX = gameModel.getSnakeX().get(0);
+        int snakeY = gameModel.getSnakeY().get(0);
         view.paintHead(snakeX, snakeY, grid);
-        for (int i = GameConstants.snakeLength - 1; i > 0; i--) {
-            view.paintBody(snakeX - GameConstants.grid * i, snakeY, grid);
+        for (int i = gameModel.getLength() - 1; i > 0; i--) {
+            view.paintBody(snakeX - grid * i, snakeY, grid);
         }
     }
 
@@ -215,7 +219,7 @@ public class GameController {
                             view.paintTail(model.getSnakeX().get(model.getLength() - 1),
                                     model.getSnakeY().get(model.getLength() - 1), grid);
                         }
-                        model.updateSnake(GameConstants.grid, GameConstants.gameWidth, GameConstants.gameHeight);//change the coordinates of the snake in every move
+                        model.updateSnake(grid, GameConstants.gameWidth, GameConstants.gameHeight);//change the coordinates of the snake in every move
                         view.paintHead(model.getSnakeX().get(0), model.getSnakeY().get(0), grid);//paint the new head
                         view.paintBody(model.getSnakeX().get(1), model.getSnakeY().get(1), grid);//paint the old head to the colour of body
                         //after the move, check if snake head hits its own body
@@ -246,14 +250,14 @@ public class GameController {
         if (gameModel.getScore() > bestScore) {
             bestScore = gameModel.getScore();
             bestPlayer = gameModel.getPlayer();
-            writeToFile(GameConstants.file);
+            writeToFile();
         }
         saveIni();
     }
 
     public void createFile(String path) {
         try {
-            File file = new File(path);
+            file = new File(path);
             if (file.createNewFile()) {
                 LOGGER.info("File {} is created successfully", file.getName());
             } else {
@@ -265,7 +269,7 @@ public class GameController {
         }
     }
 
-    public void writeToFile(String file) {
+    public void writeToFile() {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(bestPlayer + ":" + bestScore);
@@ -278,7 +282,7 @@ public class GameController {
         }
     }
 
-    public void readFromFile(String file) {
+    public void readFromFile() {
         String line;
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
@@ -342,7 +346,7 @@ public class GameController {
         //create the file to store best player and best score when there is no such file
         createFile(GameConstants.file);
         //read the best play and best score from the file
-        readFromFile(GameConstants.file);
+        readFromFile();
         getIni();
     }
 
