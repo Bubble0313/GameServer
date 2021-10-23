@@ -18,7 +18,7 @@ public class GameMVC extends Application {
         primaryStage.setTitle("Game of Snake");
         primaryStage.setScene(view.getFirstScene());
         primaryStage.show();
-        controller.startGame();
+        controller.startGame("record.txt", "config.ini");
     }
 
     public static void main(String[] args) {

@@ -20,8 +20,8 @@ public class GameControllerTest {
     private GameView gameView;
     private GameController gameController;
 
-    private static int grid = 10;
-    private static int num = 15;
+    private int grid = 10;
+    private int num = 15;
 
     @Before
     public void setup() {
@@ -41,25 +41,25 @@ public class GameControllerTest {
     }
 
     @Test
-    public void testShowFood(){
+    public void testShowFood() {
         gameController.showFood();
-        assertEquals(GameView.whole[gameController.getFoodX()/grid][gameController.getFoodY()/grid].getFill()
+        assertEquals(GameView.whole[gameController.getFoodX() / grid][gameController.getFoodY() / grid].getFill()
                 , Color.RED);
     }
 
     @Test
-    public void testPaintSnake(){
+    public void testPaintSnake() {
         gameController.paintSnake(model1);
-        assertEquals(GameView.whole[model1.getSnakeX().get(0)/grid][model1.getSnakeY().get(0)/grid].getFill()
+        assertEquals(GameView.whole[model1.getSnakeX().get(0) / grid][model1.getSnakeY().get(0) / grid].getFill()
                 , Color.YELLOW);
-        assertEquals(GameView.whole[model1.getSnakeX().get(1)/grid][model1.getSnakeY().get(1)/grid].getFill()
+        assertEquals(GameView.whole[model1.getSnakeX().get(1) / grid][model1.getSnakeY().get(1) / grid].getFill()
                 , Color.BLUE);
-        assertEquals(GameView.whole[model1.getSnakeX().get(2)/grid][model1.getSnakeY().get(2)/grid].getFill()
+        assertEquals(GameView.whole[model1.getSnakeX().get(2) / grid][model1.getSnakeY().get(2) / grid].getFill()
                 , Color.BLUE);
     }
 
     @Test
-    public void testSetModelSpeed(){
+    public void testSetModelSpeed() {
         GameController.setModelSpeed(model1, 1);
         assertEquals(model1.getSpeed(), Level.L1.speed);
         GameController.setModelSpeed(model1, 2);
@@ -81,24 +81,25 @@ public class GameControllerTest {
     }
 
     @Test
-    public void testFileOperations(){
-        gameController.createFile("test.txt");
-        assertTrue(gameController.getFile().exists());
-        assertEquals(gameController.getFile().getName(), "test.txt");
+    public void testFileOperations() {
+        gameController.setRecordFile(gameController.createFile("test.txt"));
+        assertTrue(gameController.getRecordFile().exists());
+        assertEquals(gameController.getRecordFile().getName(), "test.txt");
         gameController.writeToFile();
-        assertEquals(gameController.getFile().length(), 6L);
+        assertEquals(gameController.getRecordFile().length(), 6L);
         gameController.readFromFile();
         assertEquals(gameView.getBestPlayerText().getText(), "Best Player: N/A");
         assertEquals(gameView.getBestScoreText().getText(), "Best Score: -1");
     }
 
     @Test
-    public void testSaveIni(){
-
+    public void testStartGame() {
+        gameController.startGame("test.txt", "test.ini");
+        assertTrue(gameController.getRecordFile().exists());
+        assertTrue(gameController.getIniFile().exists());
     }
 
     @Test
-    public void testGetIni(){
-
+    public void testStopGame() {
     }
 }

@@ -34,7 +34,8 @@ public class GameController {
     private int bestScore = -1;//the highest score
     private String bestPlayer = "N/A";//player that scores the highest
 
-    private File file;
+    private File recordFile;
+    private File iniFile;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
@@ -255,23 +256,25 @@ public class GameController {
         saveIni();
     }
 
-    public void createFile(String path) {
+    public File createFile(String path) {
         try {
-            file = new File(path);
+            File file = new File(path);
             if (file.createNewFile()) {
                 LOGGER.info("File {} is created successfully", file.getName());
             } else {
                 LOGGER.info("File already exists.");
             }
+            return file;
         } catch (IOException exception) {
             LOGGER.error(exception.getMessage());
             exception.printStackTrace();
+            return null;
         }
     }
 
     public void writeToFile() {
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(recordFile));
             bufferedWriter.write(bestPlayer + ":" + bestScore);
             bufferedWriter.flush();
             bufferedWriter.close();
@@ -285,7 +288,7 @@ public class GameController {
     public void readFromFile() {
         String line;
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(recordFile));
             if ((line = bufferedReader.readLine()) != null) {
                 String[] parts = line.split(":", 2);
                 bestPlayer = parts[0];
@@ -305,16 +308,20 @@ public class GameController {
 
     public void getIni() {
         try {
-            Wini ini = new Wini(new File("config.ini"));
-            view.getFirstScene().getWindow().setX(ini.get("Screen", "Horizontal Location", double.class));
-            view.getFirstScene().getWindow().setY(ini.get("Screen", "Vertical Location", double.class));
-            view.getFirstScene().getWindow().setWidth(ini.get("Screen", "Width", double.class));
-            view.getFirstScene().getWindow().setHeight(ini.get("Screen", "Height", double.class));
-            view.getPlayerChoiceBox().setValue(ini.get("Player Number", "number"));
-            view.getName1TextField().setText(ini.get("Player1", "name"));
-            view.getLevelChoiceBox().setValue(ini.get("Player1", "level"));
-            if (view.getSnakeNum().equals(2)) {
-                view.getName2TextField().setText(ini.get("Player2", "name"));
+            Wini ini = new Wini(iniFile);
+            if (iniFile.length() == 0){
+                LOGGER.info("No ini yet.");
+            } else {
+                view.getFirstScene().getWindow().setX(ini.get("Screen", "Horizontal Location", double.class));
+                view.getFirstScene().getWindow().setY(ini.get("Screen", "Vertical Location", double.class));
+                view.getFirstScene().getWindow().setWidth(ini.get("Screen", "Width", double.class));
+                view.getFirstScene().getWindow().setHeight(ini.get("Screen", "Height", double.class));
+                view.getPlayerChoiceBox().setValue(ini.get("Player Number", "number"));
+                view.getName1TextField().setText(ini.get("Player1", "name"));
+                view.getLevelChoiceBox().setValue(ini.get("Player1", "level"));
+                if (view.getSnakeNum().equals(2)) {
+                    view.getName2TextField().setText(ini.get("Player2", "name"));
+                }
             }
         } catch (IOException exception) {
             LOGGER.error(exception.getMessage());
@@ -323,7 +330,7 @@ public class GameController {
 
     public void saveIni() {
         try {
-            Wini ini = new Wini(new File("config.ini"));
+            Wini ini = new Wini(iniFile);
             ini.put("Screen", "Horizontal Location", view.getSecondScene().getWindow().getX());
             ini.put("Screen", "Vertical Location", view.getSecondScene().getWindow().getY());
             ini.put("Screen", "Width", view.getSecondScene().getWindow().getWidth());
@@ -340,11 +347,12 @@ public class GameController {
         }
     }
 
-    public void startGame() {
+    public void startGame(String recordPath, String iniPath) {
         //add mouse clicking event handler to all the buttons
         view.getButton().addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEventHandler);
         //create the file to store best player and best score when there is no such file
-        createFile(GameConstants.file);
+        setRecordFile(createFile(recordPath));
+        setIniFile(createFile(iniPath));
         //read the best play and best score from the file
         readFromFile();
         getIni();

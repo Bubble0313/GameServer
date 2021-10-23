@@ -23,5 +23,4 @@ public class GameConstants {
     public static final int gameUpBorder = (int) (gameWidth*0.1);//space to show current score and best score
     public static final int panelWidth = gameWidth;
     public static final int panelHeight = gameHeight + gameUpBorder;
-    public static final String file = "record.txt";
 }
