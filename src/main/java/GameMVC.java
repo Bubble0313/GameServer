@@ -11,13 +11,15 @@ public class GameMVC extends Application {
     private ArrayList<GameModel> models = new ArrayList<>();
     private GameView view = new GameView(GameConstants.grid, GameConstants.panelHeight,
             GameConstants.panelWidth, GameConstants.gameUpBorder, GameConstants.num);
-    private GameController controller = new GameController(models, view);
+    private GameController controller = new GameController();
 
     @Override
     public void start(Stage primaryStage){
         primaryStage.setTitle("Game of Snake");
         primaryStage.setScene(view.getFirstScene());
         primaryStage.show();
+        controller.setModels(models);
+        controller.setView(view);
         controller.startGame("record.txt", "config.ini");
     }
 

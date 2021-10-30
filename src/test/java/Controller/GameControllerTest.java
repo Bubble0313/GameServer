@@ -30,14 +30,11 @@ public class GameControllerTest {
         gameModels = new ArrayList<>();
         gameModels.add(model1);
         gameView = new GameView(grid, 165, 150, 15, num);
-        gameController = new GameController(gameModels, gameView);
+        gameController = new GameController();
+        gameController.setModels(gameModels);
+        gameController.setView(gameView);
         gameController.setGrid(grid);
         gameController.setNum(num);
-    }
-
-    @Test
-    public void testControllerConstructor() {
-        assertNotNull(gameController);
     }
 
     @Test
@@ -100,6 +97,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void testStopGame() {
+    public void testGameRun() {
+
     }
 }

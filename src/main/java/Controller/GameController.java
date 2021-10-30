@@ -39,16 +39,10 @@ public class GameController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
-    public GameController(ArrayList<GameModel> models, GameView view) {
-        this.models = models;
-        this.view = view;
-    }
-
     private int grid = GameConstants.grid;
     private int num = GameConstants.num;
     private Random random = new Random();
     private Map<GameModel, Text> modelTextMap = new HashMap<>();
-    private Timeline tick = new Timeline();
 
     private EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
         @Override
@@ -262,7 +256,7 @@ public class GameController {
             if (file.createNewFile()) {
                 LOGGER.info("File {} is created successfully", file.getName());
             } else {
-                LOGGER.info("File already exists.");
+                LOGGER.info("File {} already exists", file.getName());
             }
             return file;
         } catch (IOException exception) {
@@ -310,7 +304,7 @@ public class GameController {
         try {
             Wini ini = new Wini(iniFile);
             if (iniFile.length() == 0){
-                LOGGER.info("No ini yet.");
+                LOGGER.info("No content in ini yet.");
             } else {
                 view.getFirstScene().getWindow().setX(ini.get("Screen", "Horizontal Location", double.class));
                 view.getFirstScene().getWindow().setY(ini.get("Screen", "Vertical Location", double.class));
