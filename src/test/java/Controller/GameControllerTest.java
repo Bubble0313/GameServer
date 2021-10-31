@@ -29,7 +29,8 @@ public class GameControllerTest {
         model1.initialiseSnake(3, grid, num);
         gameModels = new ArrayList<>();
         gameModels.add(model1);
-        gameView = new GameView(grid, 165, 150, 15, num);
+        gameView = new GameView(165, 150);
+        gameView.createSecondScene(grid, 150, 15, num);
         gameController = new GameController();
         gameController.setModels(gameModels);
         gameController.setView(gameView);
@@ -86,7 +87,7 @@ public class GameControllerTest {
         assertEquals(gameController.getRecordFile().length(), 6L);
         gameController.readFromFile();
         assertEquals(gameView.getBestPlayerText().getText(), "Best Player: N/A");
-        assertEquals(gameView.getBestScoreText().getText(), "Best Score: -1");
+        assertEquals(gameView.getBestScoreText().getText(), "Best Score: N/A");
     }
 
     @Test

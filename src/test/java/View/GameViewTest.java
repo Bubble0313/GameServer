@@ -15,7 +15,8 @@ public class GameViewTest {
 
     @Before
     public void setup(){
-        gameView = new GameView(10, 165, 150, 15, 15);
+        gameView = new GameView( 165, 150);
+        gameView.createSecondScene(10, 150, 15, 15);
     }
 
     @Test
@@ -28,17 +29,13 @@ public class GameViewTest {
         assertEquals(gameView.getPlayerChoiceBox().getItems().get(0), "1");
         assertEquals(gameView.getSpeedText().getText(), "Game Level:");
         assertEquals(gameView.getLevelChoiceBox().getItems().get(0), "Level 1");
-        assertEquals(gameView.getName1Text().getText(), "Player1 name:\n(Use keyboard arrows\n" +
+        assertEquals(gameView.getNameText().get(0).getText(), "Player1 name:\n(Use keyboard arrows\n" +
                 "to control direction)");
-        assertNotNull(gameView.getName1TextField());
-        assertEquals(gameView.getName2Text().getText(), "Player2 name:\n(Use 4 keys WASD\n" +
-                "to control direction)");
-        assertNotNull(gameView.getName2TextField());
+        assertNotNull(gameView.getNameTextField().get(0));
         assertEquals(gameView.getButton().getText(), "Start");
         assertNotNull(gameView.getFirstScene());
         assertNotNull(gameView.getSecondScene());
-        assertEquals(gameView.getCurrentScore1Text().getText(), "");
-        assertEquals(gameView.getCurrentScore2Text().getText(), "");
+        assertEquals(gameView.getCurrentScoreText().get(0).getText(), "");
         assertEquals(gameView.getBestScoreText().getText(), "Best Score: N/A");
         assertEquals(gameView.getBestPlayerText().getText(), "Best Player: N/A");
         assertEquals(gameView.getSnakeNum().intValue(), 1);

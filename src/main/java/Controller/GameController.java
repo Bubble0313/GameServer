@@ -4,7 +4,6 @@ import Constants.GameConstants;
 import Model.Direction;
 import Model.GameModel;
 import View.GameView;
-import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -87,41 +86,20 @@ public class GameController {
     private EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
+            //when game starts, create the second scene
+            view.createSecondScene(grid,GameConstants.panelWidth, GameConstants.gameUpBorder, num);
+            view.getBestPlayerText().setText("Best Player: " + bestPlayer);
+            view.getBestScoreText().setText("Best Score: " + bestScore);
+            //create models
             GameModel model1 = new GameModel();
-            model1.initialiseSnake(GameConstants.snakeLength, grid, num);
-            paintSnake(model1);
-            models.add(model1);
-            //once the button is clicked, start the game
-            models.get(0).setIsStart(true);
-            //set the speed of snake and the player based on user input
-            setModelSpeed(models.get(0), view.getLevelChoiceBox().getSelectionModel().getSelectedIndex());
-            String nameInput1 = view.getName1TextField().getText();
-            //ignoring complex characters, only presenting words and spaces, using regular expression
-            String validNameInput1 = Pattern.compile("[\\W&&\\S]*", Pattern.CASE_INSENSITIVE).matcher(nameInput1).replaceAll("");
-            if (!nameInput1.isEmpty()) {
-                models.get(0).setPlayer(validNameInput1);
-            }
-            //mapping models, texts
-            modelTextMap.put(models.get(0), view.getCurrentScore1Text());
-            //update the player name on screen
-            modelTextMap.get(models.get(0)).setText(models.get(0).getPlayer() + "'s current score: 0");
+            initModel(model1);
+            validInput(model1, 1);
             //when there are 2 players
             if (view.getSnakeNum().equals(2)) {
                 GameModel model2 = new GameModel();
-                model2.initialiseSnake(GameConstants.snakeLength, grid, num);
-                paintSnake(model2);
-                models.add(model2);
-                models.get(1).setIsStart(true);
-                setModelSpeed(models.get(1), view.getLevelChoiceBox().getSelectionModel().getSelectedIndex());
-                String nameInput2 = view.getName2TextField().getText();
-                String validNameInput2 = Pattern.compile("[\\W&&\\S]*", Pattern.CASE_INSENSITIVE).matcher(nameInput2).replaceAll("");
-                if (!nameInput1.isEmpty()) {
-                    models.get(1).setPlayer(validNameInput2);
-                }
-                modelTextMap.put(models.get(1), view.getCurrentScore2Text());
-                modelTextMap.get(models.get(1)).setText(models.get(1).getPlayer() + "'s current score: 0");
+                initModel(model2);
+                validInput(model2, 2);
                 modelTextMap.get(models.get(0)).setY(GameConstants.gameUpBorder * 0.25);
-                modelTextMap.get(models.get(1)).setVisible(true);
             }
             //switch from the first scene to the second scene
             Stage stage = (Stage) view.getFirstScene().getWindow();
@@ -137,6 +115,29 @@ public class GameController {
             }
         }
     };
+
+    public void initModel(GameModel model){
+        model.initialiseSnake(GameConstants.snakeLength, grid, num);
+        paintSnake(model);
+        models.add(model);
+        //set the speed of snake and the player based on user input
+        setModelSpeed(model, view.getLevelChoiceBox().getSelectionModel().getSelectedIndex());
+    }
+
+    public void validInput(GameModel model, int sequence){
+        String input = view.getNameTextField().get(sequence-1).getText();
+        //ignoring complex characters, only presenting words and spaces, using regular expression
+        String validInput = Pattern.compile("[\\W&&\\S]*", Pattern.CASE_INSENSITIVE).matcher(input).replaceAll("");
+        if (!input.isEmpty()) {
+            model.setPlayer(validInput);
+        }
+        //mapping models, texts
+        modelTextMap.put(model, view.getCurrentScoreText().get(sequence-1));
+        //update the player name on screen
+        modelTextMap.get(model).setText(model.getPlayer() + "'s current score: 0");
+        //once the button is clicked, start the game
+        models.get(sequence-1).setIsStart(true);
+    }
 
     public static void setModelSpeed(GameModel gameModel, int selection) {
         switch (selection) {
@@ -286,9 +287,7 @@ public class GameController {
             if ((line = bufferedReader.readLine()) != null) {
                 String[] parts = line.split(":", 2);
                 bestPlayer = parts[0];
-                view.getBestPlayerText().setText("Best Player: " + bestPlayer);
                 bestScore = Integer.parseInt(parts[1]);
-                view.getBestScoreText().setText("Best Score: " + bestScore);
             } else {
                 LOGGER.info("No record yet.");
             }
@@ -311,10 +310,10 @@ public class GameController {
                 view.getFirstScene().getWindow().setWidth(ini.get("Screen", "Width", double.class));
                 view.getFirstScene().getWindow().setHeight(ini.get("Screen", "Height", double.class));
                 view.getPlayerChoiceBox().setValue(ini.get("Player Number", "number"));
-                view.getName1TextField().setText(ini.get("Player1", "name"));
+                view.getNameTextField().get(0).setText(ini.get("Player1", "name"));
                 view.getLevelChoiceBox().setValue(ini.get("Player1", "level"));
                 if (view.getSnakeNum().equals(2)) {
-                    view.getName2TextField().setText(ini.get("Player2", "name"));
+                    view.getNameTextField().get(1).setText(ini.get("Player2", "name"));
                 }
             }
         } catch (IOException exception) {

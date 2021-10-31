@@ -9,8 +9,7 @@ import java.util.ArrayList;
 
 public class GameMVC extends Application {
     private ArrayList<GameModel> models = new ArrayList<>();
-    private GameView view = new GameView(GameConstants.grid, GameConstants.panelHeight,
-            GameConstants.panelWidth, GameConstants.gameUpBorder, GameConstants.num);
+    private GameView view = new GameView(GameConstants.panelHeight, GameConstants.panelWidth);
     private GameController controller = new GameController();
 
     @Override

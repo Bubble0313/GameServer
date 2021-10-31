@@ -15,6 +15,8 @@ import javafx.scene.text.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 @Getter
 @Setter
 public class GameView {
@@ -22,23 +24,20 @@ public class GameView {
     private Scene secondScene;
     private Text initialText;
     private Text numText;
-    private Text name1Text;
-    private Text name2Text;
+    private ArrayList<Text> nameText = new ArrayList<>();
     private Text speedText;
-    private Text currentScore1Text;
-    private Text currentScore2Text;
+    private ArrayList<Text> currentScoreText = new ArrayList<>();
     private Text bestScoreText;
     private Text bestPlayerText;
     private Button button;
-    private TextField name1TextField;
-    private TextField name2TextField;
+    private ArrayList<TextField> nameTextField = new ArrayList<>();
     private ChoiceBox levelChoiceBox;
     private ChoiceBox playerChoiceBox;
     private Integer snakeNum = 1;
 
     public static Rectangle[][] whole;
 
-    public GameView(Integer grid, Integer panelHeight, Integer panelWidth, Integer gameUpBorder, Integer num) {
+    public GameView(Integer panelHeight, Integer panelWidth) {
         //first scene
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
@@ -64,14 +63,11 @@ public class GameView {
         levelChoiceBox = new ChoiceBox();
         levelChoiceBox.getItems().addAll("Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Level 7", "Level 8", "Level 9");
         //Ask for player name
-        name1Text = new Text("Player1 name:\n(Use keyboard arrows\nto control direction)");
-        name1Text.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/40));
-        name1TextField = new TextField();
-        name2Text = new Text("Player2 name:\n(Use 4 keys WASD\nto control direction)");
-        name2Text.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/40));
-        name2Text.setVisible(false);
-        name2TextField = new TextField();
-        name2TextField.setVisible(false);
+        Text nameText1 = new Text("Player1 name:\n(Use keyboard arrows\nto control direction)");
+        nameText1.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/40));
+        nameText.add(nameText1);
+        TextField nameTextField1 = new TextField();
+        nameTextField.add(nameTextField1);
         //button to click to start the game
         button = new Button("Start");
         //layout
@@ -80,33 +76,32 @@ public class GameView {
         gridPane.add(playerChoiceBox,1,1);
         gridPane.add(speedText,0,2);
         gridPane.add(levelChoiceBox,1,2);
-        gridPane.add(name1Text,0,3);
-        gridPane.add(name1TextField,1,3);
-        gridPane.add(name2Text, 0, 4);
-        gridPane.add(name2TextField, 1, 4);
+        gridPane.add(nameText.get(0),0,3);
+        gridPane.add(nameTextField.get(0),1,3);
         gridPane.add(button,0,5);
         GridPane.setColumnSpan(initialText,2);
         GridPane.setColumnSpan(button,2);
         GridPane.setHalignment(button, HPos.CENTER);
-        //setting the first scene
-        //firstScene = new Scene(gridPane,panelWidth,panelHeight);
-        firstScene = new Scene(gridPane);
         //set action listener to choiceBox
         playerChoiceBox.getSelectionModel().selectedIndexProperty().addListener(
                 (obs, oldV, newV) -> {
                     if (newV.equals(1)) {
-                        name2Text.setVisible(true);
-                        name2TextField.setVisible(true);
+                        Text nameText2 = new Text("Player2 name:\n(Use 4 keys WASD\nto control direction)");
+                        nameText2.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/40));
+                        nameText.add(nameText2);
+                        gridPane.add(nameText.get(1), 0, 4);
+                        TextField nameTextField2 = new TextField();
+                        nameTextField.add(nameTextField2);
+                        gridPane.add(nameTextField2, 1, 4);
                         snakeNum = 2;
-                    }
-                    if (newV.equals(0)) {
-                        name2Text.setVisible(false);
-                        name2TextField.setVisible(false);
-                        snakeNum = 1;
                     }
                 }
         );
+        //setting the first scene
+        firstScene = new Scene(gridPane);
+    }
 
+    public void createSecondScene(Integer grid, Integer panelWidth, Integer gameUpBorder, Integer num){
         //second scene
         Group root = new Group();
         ObservableList list = root.getChildren();
@@ -119,20 +114,22 @@ public class GameView {
             }
         }
         //text to show current score
-        currentScore1Text = new Text(grid*2, gameUpBorder/2, "");
-        currentScore1Text.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/35));
-        currentScore2Text = new Text(grid*2, gameUpBorder*0.75, "");
-        currentScore2Text.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/35));
-        currentScore2Text.setVisible(false);
+        Text currentScoreText1 = new Text(grid*2, gameUpBorder/2, "");
+        currentScoreText1.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/35));
+        currentScoreText.add(currentScoreText1);
         //show best score and best player
         bestScoreText = new Text(panelWidth/2, gameUpBorder*0.25, "Best Score: N/A");
         bestScoreText.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/35));
         bestPlayerText = new Text(panelWidth/2, gameUpBorder*0.75, "Best Player: N/A");
         bestPlayerText.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/35));
-
-        list.addAll(currentScore1Text, currentScore2Text, bestScoreText, bestPlayerText);
+        list.addAll(currentScoreText.get(0), bestScoreText, bestPlayerText);
+        if (snakeNum.equals(2)){
+            Text currentScoreText2 = new Text(grid*2, gameUpBorder*0.75, "");
+            currentScoreText2.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/35));
+            currentScoreText.add(currentScoreText2);
+            list.add(currentScoreText.get(1));
+        }
         //setting the second scene
-        //secondScene = new Scene(root, panelWidth, panelHeight);
         secondScene = new Scene(root);
     }
 
