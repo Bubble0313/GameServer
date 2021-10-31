@@ -32,8 +32,8 @@ public class GameModel {
 
     public void initialiseSnake(int len, int grid, int num){
         length = len;
-        int headX = grid * (length + ran.nextInt(num-10));
-        int headY = grid * (length + ran.nextInt(num-10));
+        int headX = grid * (length + ran.nextInt(num/2));
+        int headY = grid * (length + ran.nextInt(num/2));
         snakeX.add(0, headX);
         snakeY.add(0, headY);
         for(int i=1; i<length; i++){

@@ -30,12 +30,29 @@ public class GameControllerTest {
         gameModels = new ArrayList<>();
         gameModels.add(model1);
         gameView = new GameView(165, 150);
+        gameView.getNameTextField().get(0).setText("Amy");
         gameView.createSecondScene(grid, 150, 15, num);
         gameController = new GameController();
         gameController.setModels(gameModels);
         gameController.setView(gameView);
         gameController.setGrid(grid);
         gameController.setNum(num);
+        gameController.setGameHeight(150);
+        gameController.setGameWidth(150);
+    }
+
+    @Test
+    public void testControllerConstructor(){
+        assertEquals(gameController.getModels(), gameModels);
+        assertEquals(gameController.getView(), gameView);
+        assertEquals(gameController.getGrid(), grid);
+        assertEquals(gameController.getNum(), num);
+        assertEquals(gameController.getGameHeight(), 150);
+        assertEquals(gameController.getGameWidth(), 150);
+        assertNotNull(gameController.getRandom());
+        assertEquals(gameController.getBestScore(), -1);
+        assertEquals(gameController.getBestPlayer(), "N/A");
+        assertNotNull(gameController.getModelTextMap());
     }
 
     @Test
@@ -98,7 +115,16 @@ public class GameControllerTest {
     }
 
     @Test
-    public void testGameRun() {
-
+    public void testInitSnake() {
+        gameController.initSnake(model1, 1);
+        assertEquals(gameModels.get(0).getPlayer(), "Amy");
+        assertEquals(gameModels.get(0).getIsStart(), true);
+        assertEquals(gameController.getModelTextMap().get(model1), gameView.getCurrentScoreText().get(0));
+        assertEquals(gameView.getCurrentScoreText().get(0).getText(), "Amy's current score: 0");
+        gameController.setFoodX(100);
+        gameController.setFoodY(100);
+        gameController.setBestPlayer("Lily");
+        gameController.setBestScore(2);
+        gameController.startRunning(model1);
     }
 }
