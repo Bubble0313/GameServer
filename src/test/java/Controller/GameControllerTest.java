@@ -8,11 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
-@RunWith(JfxRunner.class)
+//@RunWith(JfxRunner.class)
 public class GameControllerTest {
 
     private ArrayList<GameModel> gameModels;
@@ -53,6 +53,8 @@ public class GameControllerTest {
         assertEquals(gameController.getBestScore(), -1);
         assertEquals(gameController.getBestPlayer(), "N/A");
         assertNotNull(gameController.getModelTextMap());
+        gameController.setRandom(new Random());
+        gameController.setModelTextMap(new HashMap<>());
     }
 
     @Test
@@ -125,6 +127,10 @@ public class GameControllerTest {
         gameController.setFoodY(100);
         gameController.setBestPlayer("Lily");
         gameController.setBestScore(2);
-        gameController.startRunning(model1);
+        assertEquals(gameController.getFoodX(), 100);
+        assertEquals(gameController.getFoodY(), 100);
+        assertEquals(gameController.getBestPlayer(), "Lily");
+        assertEquals(gameController.getBestScore(), 2);
+        gameController.tickUpdate();
     }
 }

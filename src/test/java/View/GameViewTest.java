@@ -1,14 +1,22 @@
 package View;
 
 import de.saxsys.javafx.test.JfxRunner;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
-@RunWith(JfxRunner.class)
+//@RunWith(JfxRunner.class)
 public class GameViewTest {
 
     private GameView gameView;
@@ -16,11 +24,11 @@ public class GameViewTest {
     @Before
     public void setup(){
         gameView = new GameView( 165, 150);
-        gameView.createSecondScene(10, 150, 15, 15);
     }
 
     @Test
     public void testViewConstructor(){
+        gameView.createSecondScene(10, 150, 15, 15);
         assertEquals(gameView.getInitialText().getText(), "Welcome to the Game of Snake!\n" +
                 "Start the game by choosing player number, game level and player name(s).\n " +
                 "The higher the level you choose, the quicker the snake moves.\n " +
@@ -39,6 +47,28 @@ public class GameViewTest {
         assertEquals(gameView.getBestScoreText().getText(), "Best Score: N/A");
         assertEquals(gameView.getBestPlayerText().getText(), "Best Player: N/A");
         assertEquals(gameView.getSnakeNum().intValue(), 1);
+        gameView.setInitialText(new Text("Hello"));
+        gameView.setNumText(new Text("Number"));
+        gameView.setNameText(new ArrayList<Text>());
+        gameView.setSpeedText(new Text("Speed"));
+        gameView.setCurrentScoreText(new ArrayList<Text>());
+        gameView.setBestScoreText(new Text("best score"));
+        gameView.setBestPlayerText(new Text("best player"));
+        gameView.setButton(new Button());
+        gameView.setNameTextField(new ArrayList<TextField>());
+        gameView.setLevelChoiceBox(new ChoiceBox());
+        gameView.setPlayerChoiceBox(new ChoiceBox());
+        Group root1 = new Group();
+        Group root2 = new Group();
+        gameView.setFirstScene(new Scene(root1));
+        gameView.setSecondScene(new Scene(root2));
+    }
+
+    @Test
+    public void testSecondScene(){
+        gameView.setSnakeNum(2);
+        gameView.createSecondScene(10, 150, 15, 15);
+        assertEquals(gameView.getCurrentScoreText().size(), 2);
     }
 
     @Test

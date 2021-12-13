@@ -9,9 +9,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.util.ArrayList;
 
+@Getter
 public class GameMVC extends Application {
     private ArrayList<GameModel> models = new ArrayList<>();
     private GameView view = new GameView(GameConstants.panelHeight, GameConstants.panelWidth);

@@ -6,6 +6,7 @@ import java.lang.Math;
 
 //the class should be related to model, but not view
 public class GameConstants {
+    private GameConstants(){}
     //number of horizontal cells and vertical cells, there will be num*num cells in total
     public static final int num = 50;
     public static final int snakeLength = 8;//initial snake length

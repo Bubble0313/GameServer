@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -32,7 +33,10 @@ public class GameModelTest {
     public void testInitSnake()
     {
         gameModel.initialiseSnake(3, 10, 15);
+        gameModel.setScore(0);
+        gameModel.setRan(new Random());
         assertEquals(gameModel.getLength(), 3);
+        assertEquals(gameModel.getScore(),0);
         assertNotNull(gameModel.getSnakeX().get(0));
         assertNotNull(gameModel.getSnakeX().get(1));
         assertNotNull(gameModel.getSnakeX().get(2));
@@ -58,6 +62,31 @@ public class GameModelTest {
         assertEquals(gameModel.getSnakeY().get(0), Integer.valueOf(30));
         assertEquals(gameModel.getSnakeY().get(1), Integer.valueOf(30));
         assertEquals(gameModel.getSnakeY().get(2), Integer.valueOf(30));
+        gameModel.setDirection(Direction.UP);
+        assertEquals(gameModel.getDirection(), Direction.UP);
+        gameModel.updateSnake(10, 150, 150);
+        assertEquals(gameModel.getSnakeX().get(2), Integer.valueOf(30));
+        assertEquals(gameModel.getSnakeX().get(1), Integer.valueOf(40));
+        assertEquals(gameModel.getSnakeX().get(0), Integer.valueOf(40));
+        assertEquals(gameModel.getSnakeY().get(0), Integer.valueOf(20));
+        assertEquals(gameModel.getSnakeY().get(1), Integer.valueOf(30));
+        assertEquals(gameModel.getSnakeY().get(2), Integer.valueOf(30));
+        gameModel.setDirection(Direction.LEFT);
+        gameModel.updateSnake(10, 150, 150);
+        assertEquals(gameModel.getSnakeX().get(2), Integer.valueOf(40));
+        assertEquals(gameModel.getSnakeX().get(1), Integer.valueOf(40));
+        assertEquals(gameModel.getSnakeX().get(0), Integer.valueOf(30));
+        assertEquals(gameModel.getSnakeY().get(0), Integer.valueOf(20));
+        assertEquals(gameModel.getSnakeY().get(1), Integer.valueOf(20));
+        assertEquals(gameModel.getSnakeY().get(2), Integer.valueOf(30));
+        gameModel.setDirection(Direction.DOWN);
+        gameModel.updateSnake(10, 150, 150);
+        assertEquals(gameModel.getSnakeX().get(2), Integer.valueOf(40));
+        assertEquals(gameModel.getSnakeX().get(1), Integer.valueOf(30));
+        assertEquals(gameModel.getSnakeX().get(0), Integer.valueOf(30));
+        assertEquals(gameModel.getSnakeY().get(0), Integer.valueOf(30));
+        assertEquals(gameModel.getSnakeY().get(1), Integer.valueOf(20));
+        assertEquals(gameModel.getSnakeY().get(2), Integer.valueOf(20));
     }
 
 }
