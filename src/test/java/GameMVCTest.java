@@ -1,13 +1,8 @@
-import static org.junit.Assert.*;
-
 import Controller.GameController;
-import Controller.Level;
 import Model.GameModel;
 import View.GameView;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.junit.Before;
 import org.junit.Test;
 import org.testfx.api.FxAssert;
 import org.testfx.framework.junit.ApplicationTest;
@@ -15,9 +10,9 @@ import org.testfx.matcher.base.NodeMatchers;
 
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertNotNull;
+
 public class GameMVCTest extends ApplicationTest {
-    int grid = 10;
-    GameModel snake1 = new GameModel();
     ArrayList<GameModel> testModels = new ArrayList<>();
 
     @Override
@@ -46,31 +41,5 @@ public class GameMVCTest extends ApplicationTest {
     @Test
     public void testButton(){
         FxAssert.verifyThat(".button", NodeMatchers.hasText("Start"));
-    }
-
-    @Before
-    public void setup(){
-        snake1.initialiseSnake(8, grid, 50);
-        testModels.add(snake1);
-    }
-
-    @Test
-    public void testModelUpdateSnake(){
-        int x = snake1.getSnakeX().get(0);
-        snake1.updateSnake(grid, 500, 500);
-        int y = snake1.getSnakeX().get(0);
-        assertEquals(grid, y-x);
-    }
-
-    @Test
-    public void testViewPaint(){
-        GameView.paintTail(50, 50, grid);
-        assertEquals(Color.BLACK, GameView.whole[5][5].getFill());
-    }
-
-    @Test
-    public void testControllerSetSpeed(){
-        GameController.setModelSpeed(snake1, 2);
-        assertEquals(Level.L2.speed, snake1.getSpeed());
     }
 }
