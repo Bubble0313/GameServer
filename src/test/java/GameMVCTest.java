@@ -33,9 +33,6 @@ public class GameMVCTest extends ApplicationTest {
         assertNotNull(mvc.getModels());
         assertNotNull(mvc.getView());
         assertNotNull(mvc.getController());
-        assertNotNull(mvc.getKeyEventHandler());
-        assertNotNull(mvc.getKeyEventHandler2());
-        assertNotNull(mvc.getMouseEventHandler());
     }
 
     @Test

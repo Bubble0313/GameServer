@@ -1,21 +1,28 @@
 package Controller;
 
 import Constants.GameConstants;
+import Model.Direction;
 import Model.GameModel;
 import View.GameView;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
+import net.corpwar.lib.corpnet.Connection;
+import net.corpwar.lib.corpnet.DataReceivedListener;
+import net.corpwar.lib.corpnet.Message;
+import net.corpwar.lib.corpnet.Server;
 import org.ini4j.Wini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Getter
@@ -23,24 +30,92 @@ import java.util.regex.Pattern;
 public class GameController {
     private ArrayList<GameModel> models;
     private GameView view;
-
     private int foodX;//X coordinate of the food
     private int foodY;//Y coordinate of the food
-
-    private int bestScore = -1;//the highest score
-    private String bestPlayer = "N/A";//player that scores the highest
-
-    private File recordFile;
-    private File iniFile;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
-
     private int grid = GameConstants.grid;
     private int num = GameConstants.num;
     private int gameWidth = GameConstants.gameWidth;
     private int gameHeight = GameConstants.gameHeight;
+    private int bestScore = -1;//the highest score
+    private String bestPlayer = "N/A";//player that scores the highest
+    private File recordFile;
+    private File iniFile;
     private Random random = new Random();
     private Map<GameModel, Text> modelTextMap = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
+    private Server server;
+
+    private EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent event) {
+            KeyCode keyCode = event.getCode();
+            Direction direction = models.get(0).getLastDirection();
+            if (keyCode == KeyCode.UP && direction != Direction.DOWN) {
+                models.get(0).setDirection(Direction.UP);//user cannot directly change the direction to its opposite
+            }
+            if (keyCode == KeyCode.DOWN && direction != Direction.UP) {
+                models.get(0).setDirection(Direction.DOWN);
+            }
+            if (keyCode == KeyCode.LEFT && direction != Direction.RIGHT) {
+                models.get(0).setDirection(Direction.LEFT);
+            }
+            if (keyCode == KeyCode.RIGHT && direction != Direction.LEFT) {
+                models.get(0).setDirection(Direction.RIGHT);
+            }
+        }
+    };//change the direction of the snake based on the keyboard input
+
+    private EventHandler<KeyEvent> keyEventHandler2 = new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent event) {
+            KeyCode keyCode = event.getCode();
+            Direction direction = models.get(1).getLastDirection();
+            if (keyCode == KeyCode.W && direction != Direction.DOWN) {
+                models.get(1).setDirection(Direction.UP);//user cannot directly change the direction to its opposite
+            }
+            if (keyCode == KeyCode.S && direction != Direction.UP) {
+                models.get(1).setDirection(Direction.DOWN);
+            }
+            if (keyCode == KeyCode.A && direction != Direction.RIGHT) {
+                models.get(1).setDirection(Direction.LEFT);
+            }
+            if (keyCode == KeyCode.D && direction != Direction.LEFT) {
+                models.get(1).setDirection(Direction.RIGHT);
+            }
+        }
+    };
+
+    private EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+            //tell then client when game started
+            server.sendReliableObjectToAllClients("The game started now");
+            //when game starts, create the second scene
+            view.createSecondScene(GameConstants.grid, GameConstants.panelWidth,
+                    GameConstants.gameUpBorder, GameConstants.num);
+            view.getBestPlayerText().setText("Best Player: " + bestPlayer);
+            view.getBestScoreText().setText("Best Score: " + bestScore);
+            //Handling snake movement direction based on keyboard input
+            view.getSecondScene().addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
+            //create models
+            GameModel model1 = new GameModel();
+            initSnake(model1, 1);
+            //when there are 2 players
+            if (view.getSnakeNum().equals(2)) {
+                view.getSecondScene().addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler2);
+                GameModel model2 = new GameModel();
+                initSnake(model2, 2);
+                modelTextMap.get(models.get(0)).setY(GameConstants.gameUpBorder * 0.25);
+            }
+            //switch from the first scene to the second scene
+            Stage stage = (Stage) view.getFirstScene().getWindow();
+            stage.setScene(view.getSecondScene());
+            //paint the initial food
+            showFood();
+            //start the game tick
+            tickUpdate();
+        }
+    };
 
     public void initSnake(GameModel model, int sequence) {
         //Model:
@@ -267,6 +342,8 @@ public class GameController {
     }
 
     public void startGame(String recordPath, String iniPath) {
+        //add mouse clicking event handler to all the buttons
+        view.getButton().addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEventHandler);
         //create the file to store best player and best score when there is no such file
         setRecordFile(createFile(recordPath));
         setIniFile(createFile(iniPath));
@@ -275,4 +352,30 @@ public class GameController {
         getIni();
     }
 
+    public void network(){
+        //Start a server
+        server = new Server();
+        server.setPortAndIp(55433, "127.0.0.1");
+        server.setWaitingQue(true);
+        server.startServer();
+        //To get the data from the server you need to register a listener that get all the data
+        server.registerServerListerner(new DataReceivedListener() {
+            @Override
+            public void connected(Connection connection) {
+                System.out.println("Server connected");
+                //send messages
+                server.sendReliableObjectToAllClients("You are connected now");
+            }
+
+            @Override
+            public void receivedMessage(Message message) {
+                System.out.println("Server received: " + message.toString());
+            }
+
+            @Override
+            public void disconnected(UUID uuid) {
+                System.out.println("Server disconnected: " + uuid.toString());
+            }
+        });
+    }
 }
