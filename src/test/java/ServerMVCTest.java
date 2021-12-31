@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertNotNull;
 
-public class GameMVCTest extends ApplicationTest {
+public class ServerMVCTest extends ApplicationTest {
     ArrayList<GameModel> testModels = new ArrayList<>();
 
     @Override
@@ -29,7 +29,7 @@ public class GameMVCTest extends ApplicationTest {
 
     @Test
     public void testStart(){
-        GameMVC mvc = new GameMVC();
+        ServerMVC mvc = new ServerMVC();
         assertNotNull(mvc.getModels());
         assertNotNull(mvc.getView());
         assertNotNull(mvc.getController());

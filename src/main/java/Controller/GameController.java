@@ -11,6 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import lombok.Getter;
 import lombok.Setter;
 import net.corpwar.lib.corpnet.Connection;
@@ -100,6 +101,8 @@ public class GameController {
             //create models
             GameModel model1 = new GameModel();
             initSnake(model1, 1);
+            server.sendReliableObjectToAllClients(model1.getSnakeX().get(0));
+            server.sendReliableObjectToAllClients(model1.getSnakeY().get(0));
             //when there are 2 players
             if (view.getSnakeNum().equals(2)) {
                 view.getSecondScene().addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler2);
@@ -110,10 +113,22 @@ public class GameController {
             //switch from the first scene to the second scene
             Stage stage = (Stage) view.getFirstScene().getWindow();
             stage.setScene(view.getSecondScene());
+            stage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, handler);
             //paint the initial food
             showFood();
             //start the game tick
             tickUpdate();
+        }
+    };
+
+    private EventHandler<WindowEvent> handler = new EventHandler<WindowEvent>() {
+        @Override
+        public void handle(WindowEvent event) {
+            for (GameModel model : models) {
+                model.setIsStart(false);
+                System.out.println("close server");
+                server.killServer();
+            }
         }
     };
 
@@ -184,6 +199,8 @@ public class GameController {
         foodX = grid * random.nextInt(num - 1);
         foodY = grid * random.nextInt(num - 1);
         view.paintFood(foodX, foodY, grid);
+        server.sendReliableObjectToAllClients(foodX);
+        server.sendReliableObjectToAllClients(foodY);
     }
 
     public void tickUpdate() {
@@ -228,6 +245,7 @@ public class GameController {
         model.updateSnake(grid, gameWidth, gameHeight);//change the coordinates of the snake in every move
         view.paintHead(model.getSnakeX().get(0), model.getSnakeY().get(0), grid);//paint the new head
         view.paintBody(model.getSnakeX().get(1), model.getSnakeY().get(1), grid);//paint the old head to the colour of body
+        server.sendReliableObjectToAllClients(model.getDirection());
         //after the move, check if snake head hits its own body
         for (int i = 1; i < model.getLength(); i++) {
             if (model.getSnakeX().get(0).equals(model.getSnakeX().get(i)) &&
@@ -352,7 +370,7 @@ public class GameController {
         getIni();
     }
 
-    public void network(){
+    public void networkServer(){
         //Start a server
         server = new Server();
         server.setPortAndIp(55433, "127.0.0.1");
