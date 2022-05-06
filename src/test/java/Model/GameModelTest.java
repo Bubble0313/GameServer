@@ -32,7 +32,7 @@ public class GameModelTest {
     @Test
     public void testInitSnake()
     {
-        gameModel.initialiseSnake(3, 10, 15);
+        gameModel.initialiseSnake(3, 10, 10, 10);
         gameModel.setScore(0);
         gameModel.setRan(new Random());
         assertEquals(gameModel.getLength(), 3);

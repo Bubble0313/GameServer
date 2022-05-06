@@ -1,4 +1,5 @@
 import Controller.GameController;
+import Controller.ServerController;
 import Model.GameModel;
 import View.GameView;
 import javafx.scene.Scene;
@@ -8,19 +9,18 @@ import org.testfx.api.FxAssert;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
-import java.util.ArrayList;
-
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class ServerMVCTest extends ApplicationTest {
-    ArrayList<GameModel> testModels = new ArrayList<>();
+public class GameMVCTest extends ApplicationTest {
+    GameModel model = new GameModel();
 
     @Override
     public void start(Stage stage) {
         GameView testView = new GameView(165, 150);
         testView.createSecondScene(10, 150, 15, 15);
-        GameController testController = new GameController();
-        testController.setModels(testModels);
+        GameController testController = new ServerController();
+        testController.setModel(model);
         testController.setView(testView);
         Scene scene = testView.getFirstScene();
         stage.setScene(scene);
@@ -29,10 +29,10 @@ public class ServerMVCTest extends ApplicationTest {
 
     @Test
     public void testStart(){
-        ServerMVC mvc = new ServerMVC();
-        assertNotNull(mvc.getModels());
+        GameMVC mvc = new GameMVC();
+        assertNotNull(mvc.getModel());
         assertNotNull(mvc.getView());
-        assertNotNull(mvc.getController());
+        assertNull(mvc.getController());
     }
 
     @Test

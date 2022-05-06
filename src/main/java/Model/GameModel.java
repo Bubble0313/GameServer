@@ -30,17 +30,15 @@ public class GameModel {
         player = "Bot";
     }
 
-    public void initialiseSnake(int len, int grid, int num){
+    public void initialiseSnake(int len, int headX, int headY, int grid){
         length = len;
-        int headX = grid * (length + ran.nextInt(num/2));
-        int headY = grid * (length + ran.nextInt(num/2));
-        snakeX.add(0, headX);
-        snakeY.add(0, headY);
+        snakeX.add(0, headX*grid);
+        snakeY.add(0, headY*grid);
         for(int i=1; i<length; i++){
-            snakeX.add(i, headX-grid*i);
+            snakeX.add(i, (headX-i)*grid);
         }
         for(int i=1; i<length; i++){
-            snakeY.add(i, headY);
+            snakeY.add(i, headY*grid);
         }
     }//set snake body based on snake head
 
