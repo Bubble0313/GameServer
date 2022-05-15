@@ -75,7 +75,7 @@ public class ClientController extends GameController {
                 //receive info from server
                 DatagramPacket recPacket = new DatagramPacket(new byte[GameConstants.shortPacketLength],GameConstants.shortPacketLength);
                 socket.receive(recPacket);
-                System.out.println("Client received: " + recPacket);
+                LOGGER.info("Client received: {}", recPacket);
 
                 //get received data
                 byte[] recData = recPacket.getData();
@@ -130,37 +130,37 @@ public class ClientController extends GameController {
         switch (list.get(0)){
             case 0:
                 headX = list.get(1);
-                System.out.println("snake head x: " + list.get(1));
+                LOGGER.info("snake head x: {}", list.get(1));
                 break;
             case 1:
                 headY = list.get(1);
-                System.out.println("snake head y: " + list.get(1));
+                LOGGER.info("snake head y: {}", list.get(1));
                 break;
             case 2:
                 models.get(0).setLength(list.get(1));
-                System.out.println("snake length: " + list.get(1));
+                LOGGER.info("snake length: {}", list.get(1));
                 break;
             case 3:
                 foodX = list.get(1);
-                System.out.println("foodX: " + foodX);
+                LOGGER.info("foodX: {}", foodX);
                 break;
             case 4:
                 foodY = list.get(1);
-                System.out.println("foodY: " + foodY);
+                LOGGER.info("foodY: {}", foodY);
                 break;
             case 5:
                 increaseSnakeLength(models.get(0));
                 view.getCurrentScoreText().setText("Current score: " + models.get(0).getScore());
-                System.out.println("new snake length: " + models.get(0).getLength());
+                LOGGER.info("new snake length: {}", models.get(0).getLength());
                 foodX = list.get(1);
                 foodY = list.get(2);
                 view.paintFood(foodX, foodY);
-                System.out.println("new foodX: " + foodX);
-                System.out.println("new foodY: " + foodY);
+                LOGGER.info("new foodX: {}", foodX);
+                LOGGER.info("new foodY: {}", foodY);
                 break;
             case 6:
                 models.get(0).setIsStart(false);
-                System.out.println("hit body, game stop");
+                LOGGER.info("hit body, game stop");
                 break;
         }
     }
