@@ -9,18 +9,20 @@ import org.testfx.api.FxAssert;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class GameMVCTest extends ApplicationTest {
-    GameModel model = new GameModel();
+    ArrayList<GameModel> models = new ArrayList<>();
 
     @Override
     public void start(Stage stage) {
         GameView testView = new GameView(165, 150);
         testView.createSecondScene(10, 150, 15, 15);
         GameController testController = new ServerController();
-        testController.setModel(model);
+        testController.setModels(models);
         testController.setView(testView);
         Scene scene = testView.getFirstScene();
         stage.setScene(scene);
@@ -30,7 +32,7 @@ public class GameMVCTest extends ApplicationTest {
     @Test
     public void testStart(){
         GameMVC mvc = new GameMVC();
-        assertNotNull(mvc.getModel());
+        assertNotNull(mvc.getModels());
         assertNotNull(mvc.getView());
         assertNull(mvc.getController());
     }

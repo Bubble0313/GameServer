@@ -2,6 +2,7 @@ package Controller;
 
 import Constants.GameConstants;
 import Model.Direction;
+import Model.GameModel;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -31,27 +32,27 @@ public class ClientController extends GameController {
         @Override
         public void handle(KeyEvent event) {
             KeyCode keyCode = event.getCode();
-            Direction direction = model.getLastDirection();
+            Direction direction = models.get(0).getLastDirection();
             //user cannot directly change the direction to its opposite
             if (keyCode == KeyCode.UP && direction != Direction.DOWN) {
                 senDir[0] = 2;
                 senDir[1] = 0;
-                model.setDirection(Direction.UP);
+                models.get(0).setDirection(Direction.UP);
             }
             if (keyCode == KeyCode.DOWN && direction != Direction.UP) {
                 senDir[0] = 2;
                 senDir[1] = 1;
-                model.setDirection(Direction.DOWN);
+                models.get(0).setDirection(Direction.DOWN);
             }
             if (keyCode == KeyCode.LEFT && direction != Direction.RIGHT) {
                 senDir[0] = 2;
                 senDir[1] = 2;
-                model.setDirection(Direction.LEFT);
+                models.get(0).setDirection(Direction.LEFT);
             }
             if (keyCode == KeyCode.RIGHT && direction != Direction.LEFT) {
                 senDir[0] = 2;
                 senDir[1] = 3;
-                model.setDirection(Direction.RIGHT);
+                models.get(0).setDirection(Direction.RIGHT);
             }
             sendToServer(senDir);
         }
@@ -91,10 +92,10 @@ public class ClientController extends GameController {
 
                 //once receiving all data, initialise the snake on client side
                 if (count == 5){
-                    model.initialiseSnake(model.getLength(), headX, headY, grid);
-                    paintSnake(model.getLength(), headX, headY);
+                    models.get(0).initialiseSnake(models.get(0).getLength(), headX, headY, grid);
+                    paintSnake(models.get(0).getLength(), headX, headY);
                     view.paintFood(foodX, foodY);
-                    model.setIsStart(true);
+                    models.get(0).setIsStart(true);
                     Runnable startRun = new Runnable() {
                         @Override
                         public void run() {
@@ -111,14 +112,14 @@ public class ClientController extends GameController {
     }
 
     private void startRunning() {
-        while (model.getIsStart().equals(true)){
-            view.paintTail(model.getSnakeX().get(model.getLength() - 1)/grid,
-                    model.getSnakeY().get(model.getLength() - 1)/grid);
-            model.updateSnake(grid, gameWidth, gameHeight);
-            view.paintHead(model.getSnakeX().get(0)/grid, model.getSnakeY().get(0)/grid);//paint the new head
-            view.paintBody(model.getSnakeX().get(1)/grid, model.getSnakeY().get(1)/grid);//paint the old head to the colour of body
+        while (models.get(0).getIsStart().equals(true)){
+            view.paintTail(models.get(0).getSnakeX().get(models.get(0).getLength() - 1)/grid,
+                    models.get(0).getSnakeY().get(models.get(0).getLength() - 1)/grid);
+            models.get(0).updateSnake(grid, gameWidth, gameHeight);
+            view.paintHead(models.get(0).getSnakeX().get(0)/grid, models.get(0).getSnakeY().get(0)/grid);//paint the new head
+            view.paintBody(models.get(0).getSnakeX().get(1)/grid, models.get(0).getSnakeY().get(1)/grid);//paint the old head to the colour of body
             try {
-                Thread.sleep(model.getSpeed());
+                Thread.sleep(models.get(0).getSpeed());
             } catch (InterruptedException exception) {
                 LOGGER.error(exception.getMessage());
             }
@@ -136,7 +137,7 @@ public class ClientController extends GameController {
                 System.out.println("snake head y: " + list.get(1));
                 break;
             case 2:
-                model.setLength(list.get(1));
+                models.get(0).setLength(list.get(1));
                 System.out.println("snake length: " + list.get(1));
                 break;
             case 3:
@@ -148,9 +149,9 @@ public class ClientController extends GameController {
                 System.out.println("foodY: " + foodY);
                 break;
             case 5:
-                increaseSnakeLength(model);
-                view.getCurrentScoreText().setText("Current score: " + model.getScore());
-                System.out.println("new snake length: " + model.getLength());
+                increaseSnakeLength(models.get(0));
+                view.getCurrentScoreText().setText("Current score: " + models.get(0).getScore());
+                System.out.println("new snake length: " + models.get(0).getLength());
                 foodX = list.get(1);
                 foodY = list.get(2);
                 view.paintFood(foodX, foodY);
@@ -158,7 +159,7 @@ public class ClientController extends GameController {
                 System.out.println("new foodY: " + foodY);
                 break;
             case 6:
-                model.setIsStart(false);
+                models.get(0).setIsStart(false);
                 System.out.println("hit body, game stop");
                 break;
         }
@@ -170,10 +171,10 @@ public class ClientController extends GameController {
         //ignoring complex characters, only presenting words and spaces, using regular expression
         String validInput = Pattern.compile("[\\W&&\\S]*", Pattern.CASE_INSENSITIVE).matcher(input).replaceAll("");
         if (!validInput.isEmpty()) {
-            model.setPlayer(validInput);
+            models.get(0).setPlayer(validInput);
             senName = validInput.getBytes();
         } else {
-            senName = model.getPlayer().getBytes();
+            senName = models.get(0).getPlayer().getBytes();
         }
         sendToServer(senName);
 
@@ -184,7 +185,7 @@ public class ClientController extends GameController {
             senLevel[1] = 1;
         } else {
             int selectedLevel = view.getLevelChoiceBox().getSelectionModel().getSelectedIndex() + 1;
-            setModelSpeed(model, selectedLevel);
+            setModelSpeed(models.get(0), selectedLevel);
             senLevel[1] = (byte) (selectedLevel);
         }
         sendToServer(senLevel);
@@ -195,10 +196,19 @@ public class ClientController extends GameController {
     public void startGame() {
         //open a udp socket
         try {
-            socket = new DatagramSocket();
+            if (view.getPortChoiceBox().getSelectionModel().getSelectedIndex()==0){
+                socket = new DatagramSocket(1111);
+            }
+            if (view.getPortChoiceBox().getSelectionModel().getSelectedIndex()==1){
+                socket = new DatagramSocket(2222);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        //create a new model, set values for models
+        GameModel model = new GameModel();
+        models.add(model);
 
         //create a new thread to send info to server
         Runnable sendRun = new Runnable() {

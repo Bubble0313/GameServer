@@ -11,7 +11,7 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class GameController {
-    public GameModel model;
+    public ArrayList<GameModel> models = new ArrayList<>();
     public GameView view;
     public int grid = GameConstants.grid;
     public int num = GameConstants.num;

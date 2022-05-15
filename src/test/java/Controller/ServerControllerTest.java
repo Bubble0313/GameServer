@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.InetAddress;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -13,7 +14,7 @@ import static org.junit.Assert.*;
 //@RunWith(JfxRunner.class)
 public class ServerControllerTest {
 
-    private GameModel model;
+    private ArrayList<GameModel> models;
     private GameView gameView;
     private ServerController serverController;
 
@@ -22,13 +23,15 @@ public class ServerControllerTest {
 
     @Before
     public void setup() {
-        model = new GameModel();
-        model.initialiseSnake(3, 50, 50, grid);
+        models = new ArrayList<>();
+        GameModel model = new GameModel();
+        models.add(model);
+        models.get(0).initialiseSnake(3, 50, 50, grid);
         gameView = new GameView(165, 150);
         gameView.getNameTextField().setText("Amy");
         gameView.createSecondScene(grid, 150, 15, num);
         serverController = new ServerController();
-        serverController.setModel(model);
+        serverController.setModels(models);
         serverController.setView(gameView);
         serverController.setGrid(grid);
         serverController.setNum(num);
@@ -38,7 +41,7 @@ public class ServerControllerTest {
 
     @Test
     public void testControllerConstructor(){
-        assertEquals(serverController.getModel(), model);
+        assertEquals(serverController.getModels(), models);
         assertEquals(serverController.getView(), gameView);
         assertEquals(serverController.getGrid(), grid);
         assertEquals(serverController.getNum(), num);
@@ -60,34 +63,34 @@ public class ServerControllerTest {
     @Test
     public void testPaintSnake() {
         serverController.paintSnake(3, 50, 50);
-        assertEquals(GameView.whole[model.getSnakeX().get(0) / grid][model.getSnakeY().get(0) / grid].getFill()
+        assertEquals(GameView.whole[models.get(0).getSnakeX().get(0) / grid][models.get(0).getSnakeY().get(0) / grid].getFill()
                 , Color.YELLOW);
-        assertEquals(GameView.whole[model.getSnakeX().get(1) / grid][model.getSnakeY().get(1) / grid].getFill()
+        assertEquals(GameView.whole[models.get(0).getSnakeX().get(1) / grid][models.get(0).getSnakeY().get(1) / grid].getFill()
                 , Color.BLUE);
-        assertEquals(GameView.whole[model.getSnakeX().get(2) / grid][model.getSnakeY().get(2) / grid].getFill()
+        assertEquals(GameView.whole[models.get(0).getSnakeX().get(2) / grid][models.get(0).getSnakeY().get(2) / grid].getFill()
                 , Color.BLUE);
     }
 
     @Test
     public void testSetModelSpeed() {
-        GameController.setModelSpeed(model, 1);
-        assertEquals(model.getSpeed(), Level.L1.speed);
-        GameController.setModelSpeed(model, 2);
-        assertEquals(model.getSpeed(), Level.L2.speed);
-        GameController.setModelSpeed(model, 3);
-        assertEquals(model.getSpeed(), Level.L3.speed);
-        GameController.setModelSpeed(model, 4);
-        assertEquals(model.getSpeed(), Level.L4.speed);
-        GameController.setModelSpeed(model, 5);
-        assertEquals(model.getSpeed(), Level.L5.speed);
-        GameController.setModelSpeed(model, 6);
-        assertEquals(model.getSpeed(), Level.L6.speed);
-        GameController.setModelSpeed(model, 7);
-        assertEquals(model.getSpeed(), Level.L7.speed);
-        GameController.setModelSpeed(model, 8);
-        assertEquals(model.getSpeed(), Level.L8.speed);
-        GameController.setModelSpeed(model, 9);
-        assertEquals(model.getSpeed(), Level.L9.speed);
+        GameController.setModelSpeed(models.get(0), 1);
+        assertEquals(models.get(0).getSpeed(), Level.L1.speed);
+        GameController.setModelSpeed(models.get(0), 2);
+        assertEquals(models.get(0).getSpeed(), Level.L2.speed);
+        GameController.setModelSpeed(models.get(0), 3);
+        assertEquals(models.get(0).getSpeed(), Level.L3.speed);
+        GameController.setModelSpeed(models.get(0), 4);
+        assertEquals(models.get(0).getSpeed(), Level.L4.speed);
+        GameController.setModelSpeed(models.get(0), 5);
+        assertEquals(models.get(0).getSpeed(), Level.L5.speed);
+        GameController.setModelSpeed(models.get(0), 6);
+        assertEquals(models.get(0).getSpeed(), Level.L6.speed);
+        GameController.setModelSpeed(models.get(0), 7);
+        assertEquals(models.get(0).getSpeed(), Level.L7.speed);
+        GameController.setModelSpeed(models.get(0), 8);
+        assertEquals(models.get(0).getSpeed(), Level.L8.speed);
+        GameController.setModelSpeed(models.get(0), 9);
+        assertEquals(models.get(0).getSpeed(), Level.L9.speed);
     }
 
     @Test
@@ -109,8 +112,8 @@ public class ServerControllerTest {
     @Test
     public void testInitSnake() {
         serverController.startGame();
-        assertEquals(model.getPlayer(), "Amy");
-        assertEquals(model.getIsStart(), true);
+        assertEquals(models.get(0).getPlayer(), "Amy");
+        assertEquals(models.get(0).getIsStart(), true);
         assertEquals(gameView.getCurrentScoreText().getText(), "Amy's current score: 0");
         serverController.setFoodX(100);
         serverController.setFoodY(100);
@@ -120,6 +123,6 @@ public class ServerControllerTest {
         assertEquals(serverController.getFoodY(), 100);
         assertEquals(serverController.getBestPlayer(), "Lily");
         assertEquals(serverController.getBestScore(), 2);
-        serverController.tickUpdate();
+//        serverController.tickUpdate(, );
     }
 }

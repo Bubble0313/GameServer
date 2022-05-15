@@ -12,9 +12,11 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 @Getter
 public class GameMVC extends Application {
-    private GameModel model = new GameModel();
+    private ArrayList<GameModel> models = new ArrayList<>();
     private GameView view = new GameView(GameConstants.panelHeight, GameConstants.panelWidth);
     private GameController controller;
     private static final Logger LOGGER = LoggerFactory.getLogger(GameMVC.class);
@@ -32,7 +34,7 @@ public class GameMVC extends Application {
                     LOGGER.info("server controller");
                 }
             }
-            controller.setModel(model);
+            controller.setModels(models);
             controller.setView(view);
             controller.fileOperation();
             view.createSecondScene(GameConstants.grid, GameConstants.panelWidth,

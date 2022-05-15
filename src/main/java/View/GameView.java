@@ -29,8 +29,10 @@ public class GameView {
     private GridPane gridPane = new GridPane();
     private Text nameText;
     private Text speedText;
+    private Text portText;
     private TextField nameTextField;
     private ChoiceBox levelChoiceBox;
+    private ChoiceBox portChoiceBox;
     private Text introText;
     private String mode = "Server";
     private Text bestScoreText;
@@ -101,6 +103,11 @@ public class GameView {
         nameText = new Text("Player name:\n(Use keyboard arrows\nto control direction)");
         nameText.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/40));
         nameTextField = new TextField();
+        //Ask for running port number
+        portText = new Text("Client Port:");
+        portText.setFont(Font.font("Courier", FontWeight.BOLD, FontPosture.REGULAR, panelWidth/40));
+        portChoiceBox = new ChoiceBox();
+        portChoiceBox.getItems().addAll("1111", "2222");
 
         gridPane.getChildren().remove(button);
         gridPane.add(introText, 0,2);
@@ -108,7 +115,9 @@ public class GameView {
         gridPane.add(levelChoiceBox,1,3);
         gridPane.add(nameText,0,4);
         gridPane.add(nameTextField,1,4);
-        gridPane.add(button,0,5);
+        gridPane.add(portText, 0, 5);
+        gridPane.add(portChoiceBox, 1, 5);
+        gridPane.add(button,0,6);
         GridPane.setColumnSpan(introText,2);
     }
 
