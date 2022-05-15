@@ -8,10 +8,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -22,7 +25,6 @@ import java.util.regex.Pattern;
 @Setter
 public class ClientController extends GameController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientController.class);
-    //first byte: 1 means level, 2 means direction
     private byte[] senName = new byte[GameConstants.longPacketLength];
     private byte[] senLevel = new byte[GameConstants.shortPacketLength];
     private byte[] senDir = new byte[GameConstants.shortPacketLength];
@@ -35,33 +37,31 @@ public class ClientController extends GameController {
             Direction direction = models.get(0).getLastDirection();
             //user cannot directly change the direction to its opposite
             if (keyCode == KeyCode.UP && direction != Direction.DOWN) {
-                senDir[0] = 2;
-                senDir[1] = 0;
+                senDir[0] = 0;
                 models.get(0).setDirection(Direction.UP);
             }
             if (keyCode == KeyCode.DOWN && direction != Direction.UP) {
-                senDir[0] = 2;
-                senDir[1] = 1;
+                senDir[0] = 1;
                 models.get(0).setDirection(Direction.DOWN);
             }
             if (keyCode == KeyCode.LEFT && direction != Direction.RIGHT) {
                 senDir[0] = 2;
-                senDir[1] = 2;
                 models.get(0).setDirection(Direction.LEFT);
             }
             if (keyCode == KeyCode.RIGHT && direction != Direction.LEFT) {
-                senDir[0] = 2;
-                senDir[1] = 3;
+                senDir[0] = 3;
                 models.get(0).setDirection(Direction.RIGHT);
             }
-            sendToServer(senDir);
+            sendToServer(MessageType.DIRECTION, senDir);
         }
     };//change the direction of the snake based on the keyboard input
 
-    public void sendToServer(byte[] senData){
+    public void sendToServer(MessageType type, byte[] senData){
         try {
+            Packet packet = new Packet(type, senData);
+            byte[] data = SerializationUtils.serialize(packet);
             InetAddress address = InetAddress.getByName("localhost");
-            DatagramPacket senPacket = new DatagramPacket(senData,senData.length, address, 8088);
+            DatagramPacket senPacket = new DatagramPacket(data, data.length, address, 8088);
             socket.send(senPacket);
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,21 +73,16 @@ public class ClientController extends GameController {
             int count = 0;
             while (true){
                 //receive info from server
-                DatagramPacket recPacket = new DatagramPacket(new byte[GameConstants.shortPacketLength],GameConstants.shortPacketLength);
+                DatagramPacket recPacket = new DatagramPacket(new byte[GameConstants.longPacketLength],GameConstants.longPacketLength);
                 socket.receive(recPacket);
                 LOGGER.info("Client received: {}", recPacket);
 
                 //get received data
                 byte[] recData = recPacket.getData();
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(recData);
-                int element;
-                ArrayList<Integer> list = new ArrayList<>();
-                while ((element = byteArrayInputStream.read()) != -1){
-                    list.add(element);
-                }
+                Packet packet = SerializationUtils.deserialize(recData);
 
                 //differentiate elements
-                diffElement(list);
+                diffElement(packet);
                 count++;
 
                 //once receiving all data, initialise the snake on client side
@@ -126,39 +121,40 @@ public class ClientController extends GameController {
         }
     }
 
-    private void diffElement(ArrayList<Integer> list) {
-        switch (list.get(0)){
-            case 0:
-                headX = list.get(1);
-                LOGGER.info("snake head x: {}", list.get(1));
+    private void diffElement(Packet packet) {
+        switch (packet.getType()){
+            case SNAKE_HEAD_X:
+                headX = packet.getPayload()[0];
+                LOGGER.info("snake head x: {}", headX);
                 break;
-            case 1:
-                headY = list.get(1);
-                LOGGER.info("snake head y: {}", list.get(1));
+            case SNAKE_HEAD_Y:
+                headY = packet.getPayload()[0];
+                LOGGER.info("snake head y: {}", headY);
                 break;
-            case 2:
-                models.get(0).setLength(list.get(1));
-                LOGGER.info("snake length: {}", list.get(1));
+            case SNAKE_LENGTH:
+                int length = packet.getPayload()[0];
+                models.get(0).setLength(length);
+                LOGGER.info("snake length: {}", length);
                 break;
-            case 3:
-                foodX = list.get(1);
+            case FOOD_X:
+                foodX = packet.getPayload()[0];
                 LOGGER.info("foodX: {}", foodX);
                 break;
-            case 4:
-                foodY = list.get(1);
+            case FOOD_Y:
+                foodY = packet.getPayload()[0];
                 LOGGER.info("foodY: {}", foodY);
                 break;
-            case 5:
+            case EATEN:
                 increaseSnakeLength(models.get(0));
                 view.getCurrentScoreText().setText("Current score: " + models.get(0).getScore());
                 LOGGER.info("new snake length: {}", models.get(0).getLength());
-                foodX = list.get(1);
-                foodY = list.get(2);
+                foodX = packet.getPayload()[0];
+                foodY = packet.getPayload()[1];
                 view.paintFood(foodX, foodY);
                 LOGGER.info("new foodX: {}", foodX);
                 LOGGER.info("new foodY: {}", foodY);
                 break;
-            case 6:
+            case HIT:
                 models.get(0).setIsStart(false);
                 LOGGER.info("hit body, game stop");
                 break;
@@ -169,26 +165,27 @@ public class ClientController extends GameController {
         //send player name to server
         String input = view.getNameTextField().getText();
         //ignoring complex characters, only presenting words and spaces, using regular expression
-        String validInput = Pattern.compile("[\\W&&\\S]*", Pattern.CASE_INSENSITIVE).matcher(input).replaceAll("");
+        String validInput;
+        validInput = Pattern.compile("[\\W&&\\S]*", Pattern.CASE_INSENSITIVE).matcher(input).replaceAll("");
         if (!validInput.isEmpty()) {
             models.get(0).setPlayer(validInput);
-            senName = validInput.getBytes();
         } else {
-            senName = models.get(0).getPlayer().getBytes();
+            validInput = models.get(0).getPlayer();
         }
-        sendToServer(senName);
+        senName = validInput.getBytes();
+        sendToServer(MessageType.NAME, senName);
 
         //send game level to server
-        senLevel[0] = 1;
+        int selectedLevel;
         if (view.getLevelChoiceBox().getSelectionModel().isEmpty()){
+            selectedLevel = 1;
             LOGGER.info("Default level 1");
-            senLevel[1] = 1;
         } else {
-            int selectedLevel = view.getLevelChoiceBox().getSelectionModel().getSelectedIndex() + 1;
+            selectedLevel = view.getLevelChoiceBox().getSelectionModel().getSelectedIndex() + 1;
             setModelSpeed(models.get(0), selectedLevel);
-            senLevel[1] = (byte) (selectedLevel);
         }
-        sendToServer(senLevel);
+        senLevel[0] = (byte) selectedLevel;
+        sendToServer(MessageType.LEVEL, senLevel);
     }
 
 

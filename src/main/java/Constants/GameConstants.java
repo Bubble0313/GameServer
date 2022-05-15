@@ -25,6 +25,6 @@ public class GameConstants {
     public static final int panelWidth = gameWidth;
     public static final int panelHeight = gameHeight + gameUpBorder;
 
-    public static final int longPacketLength = 100;
+    public static final int longPacketLength = 1000;
     public static final int shortPacketLength = 10;
 }

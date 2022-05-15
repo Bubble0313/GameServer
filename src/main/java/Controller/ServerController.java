@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.SerializationUtils;
 import org.ini4j.Wini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,13 @@ public class ServerController extends GameController {
     private DatagramSocket mainSocket;
     private InetAddress clientAddress;
     private Integer clientPort;
+    private byte[] fx = new byte[GameConstants.shortPacketLength];
+    private byte[] fy = new byte[GameConstants.shortPacketLength];
+    private byte[] hx = new byte[GameConstants.shortPacketLength];
+    private byte[] hy = new byte[GameConstants.shortPacketLength];
+    private byte[] len = new byte[GameConstants.shortPacketLength];
+    private byte[] foo = new byte[GameConstants.shortPacketLength];
+    private byte[] end = new byte[GameConstants.shortPacketLength];
 
     private EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
         @Override
@@ -50,51 +58,49 @@ public class ServerController extends GameController {
         }
     };//change the direction of the snake based on the keyboard input
 
-    private void sendSnakeInfoToClient(GameModel model, InetAddress clientAddress, Integer clientPort) {
-        sendMethod(Arrays.asList(0, headX), clientAddress, clientPort);
-        sendMethod(Arrays.asList(1, headY), clientAddress, clientPort);
-        sendMethod(Arrays.asList(2, model.getLength()), clientAddress, clientPort);
+    private void sendSnakeInfoToClient(DatagramSocket socket,GameModel model, InetAddress clientAddress, Integer clientPort) {
+        hx[0] = (byte) headX;
+        hy[0] = (byte) headY;
+        len[0] = (byte) model.getLength();
+        sendToClient(socket, clientAddress, clientPort, MessageType.SNAKE_HEAD_X, hx);
+        sendToClient(socket, clientAddress, clientPort, MessageType.SNAKE_HEAD_Y, hy);
+        sendToClient(socket, clientAddress, clientPort, MessageType.SNAKE_LENGTH, len);
         paintSnake(model.getLength(), headX, headY);
     }
 
-    private void sendFoodToClient(InetAddress clientAddress, Integer clientPort) {
+    private void sendFoodToClient(DatagramSocket socket, InetAddress clientAddress, Integer clientPort) {
         showFood();
-        sendMethod(Arrays.asList(3, foodX), clientAddress, clientPort);
-        sendMethod(Arrays.asList(4, foodY), clientAddress, clientPort);
+        fx[0] = (byte) foodX;
+        fy[0] = (byte) foodY;
+        sendToClient(socket, clientAddress, clientPort, MessageType.FOOD_X, fx);
+        sendToClient(socket, clientAddress, clientPort, MessageType.FOOD_Y, fy);
     }
 
-    private void diffElement(GameModel model, ArrayList<Integer> list) {
-        switch (list.get(0)) {
-            case 1:
-                setModelSpeed(model, list.get(1));
-                LOGGER.info("level: {}", list.get(1));
+    private void diffElement(GameModel model, Packet packet) {
+        switch (packet.getType()) {
+            case LEVEL:
+                int level = packet.getPayload()[0];
+                setModelSpeed(model, level);
+                LOGGER.info("level: {}", level);
                 break;
-            case 2:
-                setDirection(model, list.get(1));
-                LOGGER.info("direction: {}", list.get(1));
+            case DIRECTION:
+                int dir = packet.getPayload()[0];
+                setDirection(model, dir);
+                LOGGER.info("direction: {}", dir);
                 break;
-            default:
-                int zeroChar = list.get(0);
-                int oneChar = list.get(1);
-                String name = "" + (char) zeroChar + (char) oneChar;
+            case NAME:
+                String name = new String(packet.getPayload(), 0, packet.getPayload().length);
                 model.setPlayer(name);
                 LOGGER.info("name: {}", name);
         }
     }
 
-    public void sendMethod(List<Integer> list, InetAddress clientAddress, Integer clientPort) {
-        byte[] newArray = new byte[GameConstants.shortPacketLength];
-        for (int i = 0; i < list.size(); i++) {
-            int value = list.get(i);
-            newArray[i] = (byte) value;
-        }
-        sendToClient(newArray, clientAddress, clientPort);
-    }
-
-    public void sendToClient(byte[] buffer, InetAddress clientAddress, Integer clientPort) {
+    public void sendToClient(DatagramSocket socket, InetAddress clientAddress, Integer clientPort, MessageType type, byte[] senData) {
         try {
-            DatagramPacket response = new DatagramPacket(buffer, GameConstants.shortPacketLength, clientAddress, clientPort);
-            mainSocket.send(response);
+            Packet packet = new Packet(type, senData);
+            byte[] data = SerializationUtils.serialize(packet);
+            DatagramPacket response = new DatagramPacket(data, data.length, clientAddress, clientPort);
+            socket.send(response);
             LOGGER.info("Sent {}", response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +124,7 @@ public class ServerController extends GameController {
         }
     }
 
-    public void tickUpdate(GameModel model, InetAddress clientAddress, Integer clientPort) {
+    public void tickUpdate(GameModel model, DatagramSocket socket, InetAddress clientAddress, Integer clientPort) {
         //override run function - while game is true, for each model, move it forward, t.sleep(game speed)
         //e.g. 4 ticks per second, use 1000/4
 
@@ -127,7 +133,7 @@ public class ServerController extends GameController {
                 public void run() {
                     //only run when the game start status is true
                     while (model.getIsStart().equals(true)) {
-                        startRunning(model, clientAddress, clientPort);
+                        startRunning(model, socket, clientAddress, clientPort);
                     }
                 }
             };
@@ -136,7 +142,7 @@ public class ServerController extends GameController {
 
     }
 
-    public void startRunning(GameModel model, InetAddress clientAddress, Integer clientPort) {
+    public void startRunning(GameModel model, DatagramSocket socket, InetAddress clientAddress, Integer clientPort) {
         if (model.getSnakeX().get(0).equals(foodX * grid) &&
                 model.getSnakeY().get(0).equals(foodY * grid)) {
             //if the positions are the same, then the snake length increases 1,
@@ -147,8 +153,10 @@ public class ServerController extends GameController {
             showFood();
             LOGGER.info("new foodX: {}", foodX);
             LOGGER.info("new foodY: {}", foodY);
+            foo[0] = (byte) foodX;
+            foo[1] = (byte) foodY;
             if (view.getMode().equals("Server")) {
-                sendMethod(Arrays.asList(5, foodX, foodY), clientAddress, clientPort);
+                sendToClient(socket, clientAddress, clientPort, MessageType.EATEN, foo);
             }
         } else {
             //if the positions are not the same, then paint the tail to black
@@ -165,7 +173,7 @@ public class ServerController extends GameController {
                 //if yes, then stop the game
                 model.setIsStart(false);
                 if (view.getMode().equals("Server")) {
-                    sendMethod(Arrays.asList(6), clientAddress, clientPort);
+                    sendToClient(socket, clientAddress, clientPort, MessageType.HIT, end);
                 }
                 //write to the file only when the new score is higher than the previous best score
                 if (model.getScore() > bestScore) {
@@ -292,7 +300,7 @@ public class ServerController extends GameController {
         }
         paintSnake(model.getLength(), headX, headY);
         showFood();
-        tickUpdate(model, clientAddress, clientPort);
+        tickUpdate(model, mainSocket, clientAddress, clientPort);
         //enable key event handler
         view.getSecondScene().addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
     }
@@ -354,27 +362,18 @@ public class ServerController extends GameController {
 
                             //get received bytes
                             byte[] recData = intermittentRequest.getData();
-                            if (intermittentRequest.getLength() != GameConstants.shortPacketLength) {
-                                String name = new String(recData, 0, intermittentRequest.getLength());
-                                model.setPlayer(name);
-                                LOGGER.info("name: {}", name);
-                            } else {
-                                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(recData);
-                                int element;
-                                ArrayList<Integer> list = new ArrayList<>();
-                                while ((element = byteArrayInputStream.read()) != -1) {
-                                    list.add(element);
-                                }
-                                //differentiate received element
-                                diffElement(model, list);
-                            }
+                            Packet packet = SerializationUtils.deserialize(recData);
+
+                            //differentiate received element
+                            diffElement(model, packet);
+
                             count++;
 
                             //after receiving player and level, send info to client and start the tick
                             if (count == 2) {
-                                sendSnakeInfoToClient(model, clientAddress, clientPort);
-                                sendFoodToClient(clientAddress, clientPort);
-                                tickUpdate(model, clientAddress, clientPort);
+                                sendSnakeInfoToClient(socket1, model, clientAddress, clientPort);
+                                sendFoodToClient(socket1, clientAddress, clientPort);
+                                tickUpdate(model, socket1,clientAddress, clientPort);
                             }
                         }
                     } catch (IOException e) {
@@ -398,27 +397,18 @@ public class ServerController extends GameController {
 
                             //get received bytes
                             byte[] recData = intermittentRequest.getData();
-                            if (intermittentRequest.getLength() != GameConstants.shortPacketLength) {
-                                String name = new String(recData, 0, intermittentRequest.getLength());
-                                model.setPlayer(name);
-                                LOGGER.info("name: {}", name);
-                            } else {
-                                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(recData);
-                                int element;
-                                ArrayList<Integer> list = new ArrayList<>();
-                                while ((element = byteArrayInputStream.read()) != -1) {
-                                    list.add(element);
-                                }
-                                //differentiate received element
-                                diffElement(model, list);
-                            }
+                            Packet packet = SerializationUtils.deserialize(recData);
+
+                            //differentiate received element
+                            diffElement(model, packet);
+
                             count++;
 
                             //after receiving player and level, send info to client and start the tick
                             if (count == 2) {
-                                sendSnakeInfoToClient(model, clientAddress, clientPort);
-                                sendFoodToClient(clientAddress, clientPort);
-                                tickUpdate(model, clientAddress, clientPort);
+                                sendSnakeInfoToClient(socket2, model, clientAddress, clientPort);
+                                sendFoodToClient(socket2, clientAddress, clientPort);
+                                tickUpdate(model, socket2, clientAddress, clientPort);
                             }
                         }
                     } catch (IOException e) {
