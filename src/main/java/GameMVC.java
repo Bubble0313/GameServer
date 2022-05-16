@@ -36,7 +36,7 @@ public class GameMVC extends Application {
             }
             controller.setModels(models);
             controller.setView(view);
-            controller.fileOperation();
+            controller.fileOperation("record.txt", "config.ini");
             view.createSecondScene(GameConstants.grid, GameConstants.panelWidth,
                     GameConstants.gameUpBorder, GameConstants.num);
             view.getBestPlayerText().setText("Best Player: " + controller.getBestPlayer());

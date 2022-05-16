@@ -137,6 +137,13 @@ public class GameView {
         whole[x][y].setFill(Color.RED);
     }
 
+    public static void paintSnake(int length, int snakeX, int snakeY) {
+        paintHead(snakeX, snakeY);
+        for (int i = length - 1; i > 0; i--) {
+            paintBody(snakeX - i, snakeY);
+        }
+    }
+
     public void createSecondScene(Integer grid, Integer panelWidth, Integer gameUpBorder, Integer num){
         //second scene
         Group root = new Group();

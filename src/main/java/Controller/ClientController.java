@@ -12,13 +12,9 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 @Getter
@@ -88,7 +84,7 @@ public class ClientController extends GameController {
                 //once receiving all data, initialise the snake on client side
                 if (count == 5){
                     models.get(0).initialiseSnake(models.get(0).getLength(), headX, headY, grid);
-                    paintSnake(models.get(0).getLength(), headX, headY);
+                    view.paintSnake(models.get(0).getLength(), headX, headY);
                     view.paintFood(foodX, foodY);
                     models.get(0).setIsStart(true);
                     Runnable startRun = new Runnable() {
@@ -145,7 +141,7 @@ public class ClientController extends GameController {
                 LOGGER.info("foodY: {}", foodY);
                 break;
             case EATEN:
-                increaseSnakeLength(models.get(0));
+                models.get(0).increaseLength();
                 view.getCurrentScoreText().setText("Current score: " + models.get(0).getScore());
                 LOGGER.info("new snake length: {}", models.get(0).getLength());
                 foodX = packet.getPayload()[0];
@@ -182,7 +178,7 @@ public class ClientController extends GameController {
             LOGGER.info("Default level 1");
         } else {
             selectedLevel = view.getLevelChoiceBox().getSelectionModel().getSelectedIndex() + 1;
-            setModelSpeed(models.get(0), selectedLevel);
+            models.get(0).setSnakeSpeed(selectedLevel);
         }
         senLevel[0] = (byte) selectedLevel;
         sendToServer(MessageType.LEVEL, senLevel);

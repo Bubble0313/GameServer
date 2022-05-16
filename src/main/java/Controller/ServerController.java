@@ -65,7 +65,7 @@ public class ServerController extends GameController {
         sendToClient(socket, clientAddress, clientPort, MessageType.SNAKE_HEAD_X, hx);
         sendToClient(socket, clientAddress, clientPort, MessageType.SNAKE_HEAD_Y, hy);
         sendToClient(socket, clientAddress, clientPort, MessageType.SNAKE_LENGTH, len);
-        paintSnake(model.getLength(), headX, headY);
+        view.paintSnake(model.getLength(), headX, headY);
     }
 
     private void sendFoodToClient(DatagramSocket socket, InetAddress clientAddress, Integer clientPort) {
@@ -80,7 +80,7 @@ public class ServerController extends GameController {
         switch (packet.getType()) {
             case LEVEL:
                 int level = packet.getPayload()[0];
-                setModelSpeed(model, level);
+                model.setSnakeSpeed(level);
                 LOGGER.info("level: {}", level);
                 break;
             case DIRECTION:
@@ -147,7 +147,7 @@ public class ServerController extends GameController {
                 model.getSnakeY().get(0).equals(foodY * grid)) {
             //if the positions are the same, then the snake length increases 1,
             //update the snake, and the current score increases 1
-            increaseSnakeLength(model);
+            model.increaseLength();
             view.getCurrentScoreText().setText("Current score: " + model.getScore());
             //tell client to increase its snake length, send new food
             showFood();
@@ -288,24 +288,24 @@ public class ServerController extends GameController {
         }
     }
 
-    private void localOperation() {
+    public void localOperation() {
         GameModel model = createNewModel();
         //set the speed of snake and the player based on user input
-        setModelSpeed(model, view.getLevelChoiceBox().getSelectionModel().getSelectedIndex());
+        model.setSnakeSpeed(view.getLevelChoiceBox().getSelectionModel().getSelectedIndex());
         String input = view.getNameTextField().getText();
         //ignoring complex characters, only presenting words and spaces, using regular expression
         String validInput = Pattern.compile("[\\W&&\\S]*", Pattern.CASE_INSENSITIVE).matcher(input).replaceAll("");
         if (!input.isEmpty()) {
             model.setPlayer(validInput);
         }
-        paintSnake(model.getLength(), headX, headY);
+        view.paintSnake(model.getLength(), headX, headY);
         showFood();
         tickUpdate(model, mainSocket, clientAddress, clientPort);
         //enable key event handler
         view.getSecondScene().addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
     }
 
-    private GameModel createNewModel() {
+    public GameModel createNewModel() {
         //create a new model
         GameModel model = new GameModel();
         models.add(model);
@@ -424,10 +424,10 @@ public class ServerController extends GameController {
     }
 
     @Override
-    public void fileOperation() {
+    public void fileOperation(String record, String ini) {
         //create the file to store best player and best score when there is no such file
-        setRecordFile(createFile("record.txt"));
-        setIniFile(createFile("config.ini"));
+        setRecordFile(createFile(record));
+        setIniFile(createFile(ini));
         //read the best play and best score from the file
         readFromRecord();
         getIni();

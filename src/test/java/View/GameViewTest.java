@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(JfxRunner.class)
+//@RunWith(JfxRunner.class)
 public class GameViewTest {
 
     private GameView gameView;
@@ -29,9 +29,9 @@ public class GameViewTest {
     public void testViewConstructor(){
         gameView.createSecondScene(10, 150, 15, 15);
         assertEquals(gameView.getInitialText().getText(), "Welcome to the Game of Snake!\n" +
-                "Start the game by choosing player mode (Server VS Client).");
+                "Start the game by choosing player mode (Local VS Network Server VS Network Client).");
         assertEquals(gameView.getModeText().getText(), "Player Mode:");
-        assertEquals(gameView.getModeChoiceBox().getItems().get(0), "Server");
+        assertEquals(gameView.getModeChoiceBox().getItems().get(0), "Local");
         assertEquals(gameView.getButton().getText(), "Start");
         assertNotNull(gameView.getFirstScene());
         assertNotNull(gameView.getSecondScene());

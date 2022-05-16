@@ -95,4 +95,43 @@ public class GameModel {
         //after making a move, set the current direction to last direction
         setLastDirection(direction);
     }
+
+    public void increaseLength(){
+        length = length +1;
+        snakeX.add(0);
+        snakeY.add(0);
+        score = score +1;
+    }
+
+    public void setSnakeSpeed(int selection) {
+        switch (selection) {
+            case 1:
+                speed = Level.L1.speed;
+                break;
+            case 2:
+                speed = Level.L2.speed;
+                break;
+            case 3:
+                speed = Level.L3.speed;
+                break;
+            case 4:
+                speed = Level.L4.speed;
+                break;
+            case 5:
+                speed = Level.L5.speed;
+                break;
+            case 6:
+                speed = Level.L6.speed;
+                break;
+            case 7:
+                speed = Level.L7.speed;
+                break;
+            case 8:
+                speed = Level.L8.speed;
+                break;
+            case 9:
+                speed = Level.L9.speed;
+                break;
+        }
+    }
 }
