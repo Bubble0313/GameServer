@@ -71,12 +71,12 @@ public class GameView {
         modeChoiceBox.getSelectionModel().selectedIndexProperty().addListener(
                 (obs, oldV, newV) -> {
                     if (newV.equals(2)) {
-                        addInputView(panelWidth);
                         setMode("Client");
+                        addInputView(panelWidth);
                     }
                     if (newV.equals(0)){
-                        addInputView(panelWidth);
                         setMode("Local");
+                        addInputView(panelWidth);
                     }
                 }
         );
@@ -115,8 +115,10 @@ public class GameView {
         gridPane.add(levelChoiceBox,1,3);
         gridPane.add(nameText,0,4);
         gridPane.add(nameTextField,1,4);
-        gridPane.add(portText, 0, 5);
-        gridPane.add(portChoiceBox, 1, 5);
+        if (mode == "Client"){
+            gridPane.add(portText, 0, 5);
+            gridPane.add(portChoiceBox, 1, 5);
+        }
         gridPane.add(button,0,6);
         GridPane.setColumnSpan(introText,2);
     }
