@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.junit.Before;
@@ -56,27 +57,35 @@ public class GameViewTest {
     }
 
     @Test
-    public void testPaintTail(){
+    public void testPainting(){
+        gameView.createSecondScene(10, 150, 15, 15);
+        GameView.paintSnake(3, 5, 5);
+        assertEquals(GameView.whole[5][5].getFill(), Color.YELLOW);
+        assertEquals(GameView.whole[4][5].getFill(), Color.BLUE);
+        assertEquals(GameView.whole[3][5].getFill(), Color.BLUE);
         GameView.paintTail(5, 5);
         assertEquals(GameView.whole[5][5].getFill(), Color.BLACK);
-    }
-
-    @Test
-    public void testPaintHead(){
-        GameView.paintHead(5, 5);
-        assertEquals(GameView.whole[5][5].getFill(), Color.YELLOW);
-    }
-
-    @Test
-    public void testPaintBody(){
-        GameView.paintBody(5, 5);
-        assertEquals(GameView.whole[5][5].getFill(), Color.BLUE);
-    }
-
-    @Test
-    public void testPaintFood(){
         GameView.paintFood(5, 5);
         assertEquals(GameView.whole[5][5].getFill(), Color.RED);
     }
 
+    @Test
+    public void testAddInputView(){
+        gameView.addInputView(150);
+        assertEquals(gameView.getIntroText().getText(), "Please select game level and player name(s).\n" +
+                "The higher the level you choose, the quicker the snake moves.\n" +
+                "If there's no input, default player name is Bot, and default game level is Level 1.");
+        assertEquals(gameView.getSpeedText().getText(), "Game Level:");
+        assertEquals(gameView.getLevelChoiceBox().getItems().get(0), "Level 1");
+        assertEquals(gameView.getNameText().getText(), "Player name:\n(Use keyboard arrows\nto control direction)");
+        assertNotNull(gameView.getNameTextField());
+        assertEquals(gameView.getPortText().getText(), "Client Port:");
+        assertEquals(gameView.getPortChoiceBox().getItems().get(0), "1111");
+        assertEquals(gameView.getMode(), "Server");
+        assertNotNull(gameView.getGridPane());
+        gameView.setPortText(new Text("Port"));
+        gameView.setPortChoiceBox(new ChoiceBox());
+        gameView.setIntroText(new Text("Intro"));
+        gameView.setGridPane(new GridPane());
+    }
 }

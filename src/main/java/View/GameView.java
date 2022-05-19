@@ -85,7 +85,7 @@ public class GameView {
         firstScene = new Scene(gridPane, panelWidth, panelHeight);
     }
 
-    private void addInputView(Integer panelWidth) {
+    public void addInputView(Integer panelWidth) {
         //Give intro to game
         introText = new Text("Please select game level and player name(s).\n" +
                 "The higher the level you choose, the quicker the snake moves.\n" +

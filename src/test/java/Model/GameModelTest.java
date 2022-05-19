@@ -17,16 +17,19 @@ public class GameModelTest {
     @Before
     public void setup(){
         gameModel = new GameModel();
+        gameModel.setIsStart(true);
+        gameModel.setPlayer("Amy");
+        gameModel.setSpeed(Level.L2.speed);
     }
 
     @Test
     public void testModelConstructor(){
         assertEquals(gameModel.getDirection(), Direction.RIGHT);
         assertEquals(gameModel.getLastDirection(), Direction.RIGHT);
-        assertEquals(gameModel.getIsStart(),false);
+        assertEquals(gameModel.getIsStart(),true);
         assertEquals(gameModel.getScore(), 0);
-        assertEquals(gameModel.getSpeed(), Level.L1.speed);
-        assertEquals(gameModel.getPlayer(), "Bot");
+        assertEquals(gameModel.getSpeed(), Level.L2.speed);
+        assertEquals(gameModel.getPlayer(), "Amy");
     }
 
     @Test
@@ -47,7 +50,7 @@ public class GameModelTest {
     }
 
     @Test
-    public void testUpdateSnake(){
+    public void testUpdateSnakePositive(){
         ArrayList<Integer> snakeX = new ArrayList<>(Arrays.asList(Integer.valueOf(30),
                 Integer.valueOf(20), Integer.valueOf(10)));
         ArrayList<Integer> snakeY = new ArrayList<>(Arrays.asList(Integer.valueOf(30),
@@ -89,4 +92,67 @@ public class GameModelTest {
         assertEquals(gameModel.getSnakeY().get(2), Integer.valueOf(20));
     }
 
+    @Test
+    public void testSetSnakeSpeed(){
+        gameModel.setSnakeSpeed(1);
+        assertEquals(gameModel.getSpeed(), Level.L1.speed);
+        gameModel.setSnakeSpeed(2);
+        assertEquals(gameModel.getSpeed(), Level.L2.speed);
+        gameModel.setSnakeSpeed(3);
+        assertEquals(gameModel.getSpeed(), Level.L3.speed);
+        gameModel.setSnakeSpeed(4);
+        assertEquals(gameModel.getSpeed(), Level.L4.speed);
+        gameModel.setSnakeSpeed(5);
+        assertEquals(gameModel.getSpeed(), Level.L5.speed);
+        gameModel.setSnakeSpeed(6);
+        assertEquals(gameModel.getSpeed(), Level.L6.speed);
+        gameModel.setSnakeSpeed(7);
+        assertEquals(gameModel.getSpeed(), Level.L7.speed);
+        gameModel.setSnakeSpeed(8);
+        assertEquals(gameModel.getSpeed(), Level.L8.speed);
+        gameModel.setSnakeSpeed(9);
+        assertEquals(gameModel.getSpeed(), Level.L9.speed);
+    }
+
+    @Test
+    public void testIncreaseLength(){
+        gameModel.increaseLength();
+        assertEquals(gameModel.getLength(),1);
+        assertEquals(gameModel.getScore(), 1);
+    }
+
+    @Test
+    public void testUpdateSnakeNegative(){
+        ArrayList<Integer> snakeX = new ArrayList<>(Arrays.asList(Integer.valueOf(100),
+                Integer.valueOf(90), Integer.valueOf(80)));
+        ArrayList<Integer> snakeY = new ArrayList<>(Arrays.asList(Integer.valueOf(30),
+                Integer.valueOf(30), Integer.valueOf(30)));
+        gameModel.setSnakeX(snakeX);
+        gameModel.setSnakeY(snakeY);
+        gameModel.setLength(3);
+        gameModel.setIsStart(true);
+        gameModel.updateSnake(10, 100, 100);
+        assertEquals(gameModel.getIsStart(),false);
+        gameModel.setIsStart(true);
+        gameModel.setDirection(Direction.LEFT);
+        snakeX = new ArrayList<>(Arrays.asList(Integer.valueOf(0),
+                Integer.valueOf(10), Integer.valueOf(20)));
+        gameModel.setSnakeX(snakeX);
+        gameModel.updateSnake(10, 100, 100);
+        assertEquals(gameModel.getIsStart(),false);
+        gameModel.setIsStart(true);
+        gameModel.setDirection(Direction.UP);
+        snakeY = new ArrayList<>(Arrays.asList(Integer.valueOf(0),
+                Integer.valueOf(10), Integer.valueOf(20)));
+        gameModel.setSnakeY(snakeY);
+        gameModel.updateSnake(10, 100, 100);
+        assertEquals(gameModel.getIsStart(),false);
+        gameModel.setIsStart(true);
+        gameModel.setDirection(Direction.DOWN);
+        snakeY = new ArrayList<>(Arrays.asList(Integer.valueOf(100),
+                Integer.valueOf(90), Integer.valueOf(80)));
+        gameModel.setSnakeY(snakeY);
+        gameModel.updateSnake(10, 100, 100);
+        assertEquals(gameModel.getIsStart(),false);
+    }
 }

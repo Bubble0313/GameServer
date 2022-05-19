@@ -8,19 +8,17 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-@Getter
 public class GameMVC extends Application {
-    private ArrayList<GameModel> models = new ArrayList<>();
-    private GameView view = new GameView(GameConstants.panelHeight, GameConstants.panelWidth);
-    private GameController controller;
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameMVC.class);
-    private EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>() {
+    public static ArrayList<GameModel> models = new ArrayList<>();
+    public static GameView view;
+    public static GameController controller;
+    public static final Logger LOGGER = LoggerFactory.getLogger(GameMVC.class);
+    public static EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
             if (view.getMode().equals("Client")){
@@ -49,6 +47,7 @@ public class GameMVC extends Application {
 
     @Override
     public void start(Stage primaryStage){
+        view = new GameView(GameConstants.panelHeight, GameConstants.panelWidth);
         primaryStage.setTitle("Game of Snake");
         primaryStage.setScene(view.getFirstScene());
         primaryStage.show();
