@@ -25,18 +25,18 @@ import java.util.regex.Pattern;
 public class ServerController extends GameController {
     private File recordFile;
     private File iniFile;
-    private Random random = new Random();
+    private static Random random = new Random();
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerController.class);
-    private DatagramSocket mainSocket;
-    private InetAddress clientAddress;
-    private Integer clientPort;
-    private byte[] fx = new byte[GameConstants.shortPacketLength];
-    private byte[] fy = new byte[GameConstants.shortPacketLength];
-    private byte[] hx = new byte[GameConstants.shortPacketLength];
-    private byte[] hy = new byte[GameConstants.shortPacketLength];
-    private byte[] len = new byte[GameConstants.shortPacketLength];
-    private byte[] foo = new byte[GameConstants.shortPacketLength];
-    private byte[] end = new byte[GameConstants.shortPacketLength];
+    private static DatagramSocket mainSocket;
+    private static InetAddress clientAddress;
+    private static Integer clientPort;
+    private static byte[] fx = new byte[GameConstants.shortPacketLength];
+    private static byte[] fy = new byte[GameConstants.shortPacketLength];
+    private static byte[] hx = new byte[GameConstants.shortPacketLength];
+    private static byte[] hy = new byte[GameConstants.shortPacketLength];
+    private static byte[] len = new byte[GameConstants.shortPacketLength];
+    private static byte[] foo = new byte[GameConstants.shortPacketLength];
+    private static byte[] end = new byte[GameConstants.shortPacketLength];
 
     private EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
         @Override
@@ -76,7 +76,7 @@ public class ServerController extends GameController {
         sendToClient(socket, clientAddress, clientPort, MessageType.FOOD_Y, fy);
     }
 
-    private void diffElement(GameModel model, Packet packet) {
+    public void diffElement(GameModel model, Packet packet) {
         switch (packet.getType()) {
             case LEVEL:
                 int level = packet.getPayload()[0];

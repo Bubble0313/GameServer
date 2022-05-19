@@ -21,10 +21,10 @@ import java.util.regex.Pattern;
 @Setter
 public class ClientController extends GameController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientController.class);
-    private byte[] senName = new byte[GameConstants.longPacketLength];
-    private byte[] senLevel = new byte[GameConstants.shortPacketLength];
-    private byte[] senDir = new byte[GameConstants.shortPacketLength];
-    private DatagramSocket socket;
+    private static byte[] senName = new byte[GameConstants.longPacketLength];
+    private static byte[] senLevel = new byte[GameConstants.shortPacketLength];
+    private static byte[] senDir = new byte[GameConstants.shortPacketLength];
+    private static DatagramSocket socket;
 
     private EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
         @Override
@@ -117,7 +117,7 @@ public class ClientController extends GameController {
         }
     }
 
-    private void diffElement(Packet packet) {
+    public void diffElement(Packet packet) {
         switch (packet.getType()){
             case SNAKE_HEAD_X:
                 headX = packet.getPayload()[0];
