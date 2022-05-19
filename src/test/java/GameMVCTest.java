@@ -1,11 +1,10 @@
-import javafx.scene.input.MouseButton;
+import javafx.geometry.Point2D;
 import org.junit.Before;
 import org.junit.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class GameMVCTest {
 
@@ -13,7 +12,10 @@ public class GameMVCTest {
     public void setup() throws Exception {
         FxToolkit.registerPrimaryStage();
         FxToolkit.setupApplication(GameMVC.class);
-        new FxRobot().clickOn(GameMVC.view.getButton());
+        FxRobot robot = new FxRobot();
+        robot.clickOn(GameMVC.view.getModeChoiceBox());
+        robot.clickOn(new Point2D(550.0, 425.0));
+        robot.clickOn(GameMVC.view.getButton());
     }
 
     @Test
@@ -21,6 +23,6 @@ public class GameMVCTest {
         assertNotNull(GameMVC.models);
         assertNotNull(GameMVC.view);
         assertNotNull(GameMVC.mouseEventHandler);
-        assertNull(GameMVC.controller);
+        assertNotNull(GameMVC.controller);
     }
 }
