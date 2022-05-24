@@ -4,10 +4,17 @@ import Model.Direction;
 import Model.GameModel;
 import View.GameView;
 import de.saxsys.javafx.test.JfxRunner;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyEvent;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -50,6 +57,13 @@ public class ServerControllerTest {
         assertEquals(serverController.getGameWidth(), 150);
         assertEquals(serverController.getBestScore(), -1);
         assertEquals(serverController.getBestPlayer(), "N/A");
+        assertNotNull(serverController.getKeyEventHandler());
+        serverController.setKeyEventHandler(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+
+            }
+        });
     }
 
     @Test
@@ -61,13 +75,13 @@ public class ServerControllerTest {
 
     @Test
     public void testFileOperations() {
-        serverController.fileOperation("test.txt", "test.ini");
+        serverController.fileOperation("record.txt", "config.ini");
         assertTrue(serverController.getRecordFile().exists());
         assertTrue(serverController.getIniFile().exists());
-        serverController.setRecordFile(serverController.createFile("test.txt"));
+        serverController.setRecordFile(serverController.createFile("record.txt"));
         assertTrue(serverController.getRecordFile().exists());
-        assertEquals(serverController.getRecordFile().getName(), "test.txt");
-        assertEquals(serverController.getRecordFile().length(), 6L);
+        assertEquals(serverController.getRecordFile().getName(), "record.txt");
+        assertEquals(serverController.getRecordFile().length(), 0);
     }
 
     @Test
@@ -103,5 +117,18 @@ public class ServerControllerTest {
         packet.setPayload("Amy".getBytes());
         serverController.diffElement(models.get(0), packet);
         assertEquals(models.get(0).getPlayer(), "Amy");
+    }
+
+    @After
+    public void cleanup() {
+        Path path1 = FileSystems.getDefault().getPath("record.txt");
+        Path path2 = FileSystems.getDefault().getPath("config.ini");
+        try {
+            Files.delete(path1);
+            Files.delete(path2);
+            System.out.println("deleted");
+        }catch (IOException e) {
+            System.err.println(e);
+        }
     }
 }

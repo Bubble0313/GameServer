@@ -131,19 +131,17 @@ public class ServerController extends GameController {
     public void tickUpdate(GameModel model, DatagramSocket socket, InetAddress clientAddress, Integer clientPort) {
         //override run function - while game is true, for each model, move it forward, t.sleep(game speed)
         //e.g. 4 ticks per second, use 1000/4
-
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    //only run when the game start status is true
-                    while (model.getIsStart().equals(true)) {
-                        startRunning(model, socket, clientAddress, clientPort);
-                    }
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                //only run when the game start status is true
+                while (model.getIsStart().equals(true)) {
+                    startRunning(model, socket, clientAddress, clientPort);
                 }
-            };
-            Thread t = new Thread(r);
-            t.start();//run in a separate thread
-
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();//run in a separate thread
     }
 
     public void startRunning(GameModel model, DatagramSocket socket, InetAddress clientAddress, Integer clientPort) {
