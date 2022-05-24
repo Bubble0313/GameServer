@@ -45,15 +45,19 @@ public class ServerController extends GameController {
             Direction direction = models.get(0).getLastDirection();
             if (keyCode == KeyCode.UP && direction != Direction.DOWN) {
                 models.get(0).setDirection(Direction.UP);//user cannot directly change the direction to its opposite
+                LOGGER.info("Pressed Up");
             }
             if (keyCode == KeyCode.DOWN && direction != Direction.UP) {
                 models.get(0).setDirection(Direction.DOWN);
+                LOGGER.info("Pressed Down");
             }
             if (keyCode == KeyCode.LEFT && direction != Direction.RIGHT) {
                 models.get(0).setDirection(Direction.LEFT);
+                LOGGER.info("Pressed Left");
             }
             if (keyCode == KeyCode.RIGHT && direction != Direction.LEFT) {
                 models.get(0).setDirection(Direction.RIGHT);
+                LOGGER.info("Pressed Right");
             }
         }
     };//change the direction of the snake based on the keyboard input
